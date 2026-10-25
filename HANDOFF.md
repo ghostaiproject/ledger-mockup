@@ -1,6 +1,12 @@
 # Solva (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, public accounting + computer first)
+## LATEST (2026-10-25, Tauri app: Next 1 scaffold)
+- Plan: `docs/APP-PLAN.md` (layout, Store API, keys/unlock, disk format, sync, CI, order of work). Decided: Google Drive first, unsigned builds for now, Windows tools local / Android in CI.
+- Scaffold: `package.json` (@tauri-apps/cli), `tools/build_web.mjs` (web files → `dist/`, stamps ?v=), `src-tauri/` (conf, Cargo, lib.rs with `app_info`, capabilities, icons from `app-icon.png` placeholder). Pages workflow untouched.
+- Toolchain on this PC: rustup stable (MSVC) + VS 2022 C++ Build Tools. Cargo is in `%USERPROFILE%\.cargo\bin` (new shells only).
+- Build: `npx tauri build --debug --no-bundle` → `src-tauri/target/debug/solva.exe`. Next: plan step 2 (`store.js` + web backend).
+
+## Before (2026-10-25, public accounting + computer first)
 - Built for a CPA firm first. New screens: `#/engagements` (compilation NCSC 4200, review NCME 2400, T2/CO-17, T1/TP-1, bookkeeping; 7 stages with gates: letter, independence, client docs, year-end sign-offs), `#/yearend` (Deux-Pins at 2026-06-30: trial balance, 4 proposed AJEs incl. tax 12.2 %, lead sheets with variance flags, compiled statements + compilation report, preparer → reviewer → partner sign-off, print, CSV), `#/requests` (PBC list per engagement), `#/time` (timer, entries, budget vs actual, WIP, bill → invoice, CSV), `#/more` (phone index).
 - Code: `firm-data.js` (staff, engagements, time, PBC, TB), `firm-i18n.js` + `firm-i18n-en.js` (`tf()`), `firm.js` (engagements, requests, more, Today tasks), `firm-time.js`, `yearend.js`, `firm.css` (firm styles + computer-first layout: 1560px app, grouped side bar, dense rows).
 - Phone bar = Today, Engagements, Calendar, Review, More. Computer = every section in 3 groups.

@@ -1,0 +1,15 @@
+{
+  "name": "solva",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Solva desktop/Android app (Tauri 2). The web demo needs none of this.",
+  "scripts": {
+    "web": "node tools/build_web.mjs",
+    "tauri": "tauri",
+    "app:dev": "tauri dev",
+    "app:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.0"
+  }
+}
