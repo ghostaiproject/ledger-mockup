@@ -110,7 +110,7 @@ function renderMore() {
 
 function renderFirm() {
   document.querySelectorAll('[data-i18n-tf]').forEach((el) => { el.textContent = getP(tf(), el.dataset.i18nTf); });
-  renderEngagements(); renderRequests(); renderTime(); renderYearend(); renderMore(); }
+  renderEngagements(); EngAdd.after(); renderRequests(); renderTime(); renderYearend(); renderMore(); }
 
 document.addEventListener('click', (ev) => {
   const a = ev.target.closest('a[data-go-eng]'); if (a) { state.firm.tFilter = a.dataset.goEng; state.firm.pbcFocus = a.dataset.goEng; return; }

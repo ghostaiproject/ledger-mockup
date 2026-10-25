@@ -714,7 +714,7 @@ function route(first) {
   if (!first) { window.scrollTo(0, 0); $(`[data-screen="${state.route}"] h1`).focus({ preventScroll: true }); }
 }
 window.addEventListener('hashchange', () => route(false));
-Store.ready().then(Bind.load).then(() => { route(true); document.documentElement.classList.remove('booting'); })
+Store.ready().then(Bind.load).then(() => { SyncUI.start(); route(true); document.documentElement.classList.remove('booting'); })
   .catch((e) => { // app only: vault could not open (lock screen comes with the device-key vault)
     document.documentElement.classList.remove('booting');
     document.body.innerHTML = `<main class="vault-err"><h1>Folio</h1><p>${String(e).replace(/</g, '&lt;')}</p></main>`;

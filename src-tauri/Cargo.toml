@@ -23,6 +23,9 @@ hex = "0.4"
 zeroize = "1"
 argon2 = "0.5"
 hkdf = "0.12"
+ureq = { version = "2", features = ["json"] }
+base64 = "0.22"
+tauri-plugin-opener = "2"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = ["Foundation", "Security_Credentials", "Security_Cryptography", "Storage_Streams", "Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }

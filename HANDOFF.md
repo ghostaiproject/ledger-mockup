@@ -1,6 +1,14 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, app icon + add clients by hand)
+## LATEST (2026-10-25, Google Drive sync + warm forest green + new-engagement form)
+- Colors: mint `#DAF1DE` is gone from the tokens. Light: buttons `--accent` #234233, `--tint` #e1e9d6, `--on-accent` #e8efdc, `--accent-ink` #2d5139. Dark: `--accent` #b7cfa3, `--tint` #222a1f. Walnut stays the ring/progress color. Icon and hero art not recolored.
+- `engagement-add.js` ("Nouveau mandat" form under the list; `due` must be a Date like the samples, a number crashes engRow).
+- Sync (plan §6), Rust: `sync.rs` (3-way per sealed file, base hash in sealed `sync/state.json`; both changed = higher (at, dev) wins, loser kept in `sync/conflicts/`; delete travels; foreign-key file refused; unit test with 2 devices), `drive.rs` (Drive v3 appDataFolder via ureq, sha256 in appProperties), `oauth.rs` (PKCE loopback, scope drive.appdata, opens browser with tauri-plugin-opener). Commands `sync_status/connect/disconnect/run`, `conflicts_list`, `conflict_del`. Disk gained `sync_files/raw_get/raw_put/raw_del/side_*`.
+- JS: `sync-ui.js` + `sync-i18n.js` (cloud button in the header, panel: connect, sync now, conflicts restore/dismiss; auto sync on open + every 5 min), `Store.ingest(rec)` merges downloaded records, `StoreNative.sync.*`.
+- NEEDS from the owner: a Google Cloud OAuth client (type Desktop app, Drive API enabled, drive.appdata scope) → `%APPDATA%\ca.folio.app\google.json` {"client_id","client_secret"} (or env FOLIO_GOOGLE_CLIENT_ID/SECRET). NOT tried against real Google yet; only the merge logic is tested (in-memory remote). Android: loopback sign-in untested, deep link not done.
+- `npm run check` ALL OK, incl. new checks (hand-added client + engagement survive restart, sync button).
+
+## Before (2026-10-25, app icon + add clients by hand)
 - Icon: /ceig (Gemini) walnut F with mint page edge + ledger lines on charcoal, `src-tauri/app-icon.png` → `npx tauri icon` regenerated `src-tauri/icons/*` (incl. android).
 - Clients screen: "Ajouter un client" form (`clients-add.js`, loaded before app.js; `ClientsAdd.sync()/after()` called from `render()`). Own clients live in `state.myClients`, saved as collection `myclients` (Bind LISTS), merged into `CLIENTS`; remove button + undo toast. Only clients; engagements/deadlines/autopilot still have no manual add (follow-up).
 - Checked in browser (add + remove) and `npm run check` ALL OK. Not yet tested: add client then restart in the Tauri app.

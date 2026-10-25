@@ -1,14 +1,14 @@
-/* Folio: phone-first, calm. Black and white, walnut brown, one pale mint (#DAF1DE). Light by default. Tokens follow webd. */
+/* Folio: phone-first, calm. Black and white, walnut brown, warm forest green (#234233). Light by default. Tokens follow webd. */
 :root {
   --bg: #f6f4f0;
   --surface: #ffffff;
   --ink: #1a1714;
   --muted: #5f574e;
   --line: #e4ded5;
-  --accent: #1a1714;
-  --accent-ink: #6b4a33;
-  --on-accent: #daf1de;
-  --tint: #daf1de;
+  --accent: #234233;
+  --accent-ink: #2d5139;
+  --on-accent: #e8efdc;
+  --tint: #e1e9d6;
   --soft: #efebe5;
   --raised: #ffffff;
   --ring: #8a6244;
@@ -28,10 +28,10 @@
   --ink: #f3f0eb;
   --muted: #aaa196;
   --line: #2b2722;
-  --accent: #daf1de;
-  --accent-ink: #daf1de;
-  --on-accent: #11100e;
-  --tint: #27221d;
+  --accent: #b7cfa3;
+  --accent-ink: #b7cfa3;
+  --on-accent: #121a12;
+  --tint: #222a1f;
   --soft: #1f1c19;
   --raised: #302b26;
   --ring: #c9a27e;

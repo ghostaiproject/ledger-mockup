@@ -1,0 +1,27 @@
+/* Texts of the sync panel (sync-ui.js), FR and EN. */
+const SYNC_T = {
+  fr: {
+    btn: 'Synchronisation', title: 'Synchronisation Google Drive',
+    lead: 'Vos dossiers restent chiffrés sur cet appareil. Google Drive ne reçoit que des fichiers chiffrés, dans un dossier réservé à Folio : ni Google ni personne d’autre ne peut les lire.',
+    off: 'Non connecté', on: 'Connecté', never: 'Jamais synchronisé', last: (s) => `Dernière synchronisation : ${s}`,
+    connect: 'Connecter Google Drive', connecting: 'Ouverture de Google… terminez dans le navigateur.', now: 'Synchroniser maintenant', syncing: 'Synchronisation…',
+    disconnect: 'Déconnecter', close: 'Fermer',
+    setup: 'Il manque l’identifiant Google (client OAuth « Application de bureau »). Mettez-le dans google.json dans le dossier de données de Folio : {"client_id": "…", "client_secret": "…"}.',
+    done: (r) => `${r.up} envoyé${r.up > 1 ? 's' : ''} · ${r.down} reçu${r.down > 1 ? 's' : ''}${r.conflicts ? ` · ${r.conflicts} conflit${r.conflicts > 1 ? 's' : ''}` : ''}`,
+    bad: (n) => `${n} fichier(s) n’ont pas pu être synchronisés (réessayez).`,
+    cH: 'Conflits', cLead: 'Deux appareils ont modifié la même fiche. La plus récente a été gardée ; voici l’autre version.',
+    cNone: 'Aucun conflit.', restore: 'Reprendre cette version', dismiss: 'Ignorer', restored: 'Version reprise',
+  },
+  en: {
+    btn: 'Sync', title: 'Google Drive sync',
+    lead: 'Your files stay encrypted on this device. Google Drive only gets encrypted files, in a folder reserved for Folio: neither Google nor anyone else can read them.',
+    off: 'Not connected', on: 'Connected', never: 'Never synced', last: (s) => `Last sync: ${s}`,
+    connect: 'Connect Google Drive', connecting: 'Opening Google… finish in the browser.', now: 'Sync now', syncing: 'Syncing…',
+    disconnect: 'Disconnect', close: 'Close',
+    setup: 'The Google client id is missing (OAuth client of type "Desktop app"). Put it in google.json in the Folio data folder: {"client_id": "…", "client_secret": "…"}.',
+    done: (r) => `${r.up} sent · ${r.down} received${r.conflicts ? ` · ${r.conflicts} conflict${r.conflicts > 1 ? 's' : ''}` : ''}`,
+    bad: (n) => `${n} file(s) could not sync (try again).`,
+    cH: 'Conflicts', cLead: 'Two devices changed the same record. The newer one was kept; here is the other version.',
+    cNone: 'No conflicts.', restore: 'Use this version', dismiss: 'Dismiss', restored: 'Version restored',
+  },
+};
