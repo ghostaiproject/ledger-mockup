@@ -1,7 +1,7 @@
 # Solva
 
 Phone-first mock of an accountant's workbench for a Québec firm (cabinet comptable): Autopilot prepares the books,
-the accountant reviews every decision with its reason, tunes the engine, signs off, and files on time. Dark green. Bilingual FR-CA / EN-CA, light and dark.
+the accountant reviews every decision with its reason, tunes the engine, signs off, and files on time. Black and white, walnut brown, pale mint #DAF1DE; light by default. Bilingual FR-CA / EN-CA, light and dark.
 Live: https://ghostaiproject.github.io/ledger-mockup/
 
 Built with the `webd` skill (Ghostskills). Static HTML/CSS/JS, fake data, nothing is filed or sent.

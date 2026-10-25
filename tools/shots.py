@@ -31,10 +31,10 @@ def sheet(page, shots):
     page.screenshot(path=OUT / 'sheet.jpg', full_page=True, type='jpeg', quality=60)
 
 
-def shot(b, route, w, h, light=False, full=False, mobile=False, sample=False, tour=0):
+def shot(b, route, w, h, dark=False, full=False, mobile=False, sample=False, tour=0):
     pg = b.new_page(viewport={'width': w, 'height': h}, device_scale_factor=2 if mobile else 1, is_mobile=mobile, has_touch=mobile)
     pg.goto(URL + route, wait_until='networkidle')
-    if light:  # dark is the default; the toggle switches to light
+    if dark:  # light is the default; the toggle switches to dark
         pg.click('[data-theme-toggle]')
     if sample:  # guided sample: run the tour to step `tour` (0 = only Autopilot), then show `route`
         pg.click('.screen.on [data-sample]')
@@ -46,7 +46,7 @@ def shot(b, route, w, h, light=False, full=False, mobile=False, sample=False, to
         if tour == 0:
             pg.evaluate("state.tour = null; render()")
     pg.wait_for_timeout(600)
-    name = (route.strip('#/') or 'home') + ('-light' if light else '') + ('-phone' if mobile else '') + ('-done' if sample else '')
+    name = (route.strip('#/') or 'home') + ('-dark' if dark else '') + ('-phone' if mobile else '') + ('-done' if sample else '')
     return pg.screenshot(path=OUT / f'{name}.png', full_page=full)
 
 
@@ -54,12 +54,12 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     shots = [('Landing', shot(b, '', 1440, 900)),
              ('Desktop · Review (tour step 5)', shot(b, '#/review', 1440, 900, sample=True, tour=4)),
-             ('Landing · light', shot(b, '', 1440, 900, light=True)),
+             ('Landing · dark', shot(b, '', 1440, 900, dark=True)),
              ('Desktop · Engine', shot(b, '#/engine', 1440, 900)),
              ('Phone · Tour step 3', shot(b, '#/auto', 390, 844, mobile=True, sample=True, tour=2)),
-             ('Phone · Calendar', shot(b, '#/calendar', 390, 844, mobile=True)),
-             ('Phone · Review · light', shot(b, '#/review', 390, 844, light=True, mobile=True, sample=True, tour=7)),
-             ('Phone · Today', shot(b, '#/today', 390, 844, mobile=True))]
+             ('Phone · Calendar · dark', shot(b, '#/calendar', 390, 844, dark=True, mobile=True)),
+             ('Phone · Review', shot(b, '#/review', 390, 844, mobile=True, sample=True, tour=7)),
+             ('Phone · Today · dark', shot(b, '#/today', 390, 844, dark=True, mobile=True))]
     sheet(b.new_page(), shots)
     b.close()
 

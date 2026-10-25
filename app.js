@@ -13,6 +13,8 @@ const T = {
       ['sliders-horizontal', 'Le moteur, réglable et vérifiable', 'Taux, CTI par compte, seuils, règles de fournisseurs : tout se change, tout est noté, et dix contrôles se refont à la main.'],
       ['calendar-days', 'Un calendrier pour tout le portefeuille', 'TPS/TVQ, DAS, acomptes, T2/CO-17, T4/RL-1 : calculés selon le profil de chaque client, exportables vers ton agenda.'],
     ],
+    peek: { cats: [['Hydro-Québec', 'Électricité'], ['Bell', 'Téléphone'], ['RONA', 'Matériel']], due: 'TPS/TVQ', dueSub: 'Café Mistral · dans 8 jours',
+      files: [['CM', 'Café Mistral', 'À faire', 'amber'], ['TN', 'Transports Nordet', 'Prêt', '']], close: 'Fin de septembre' },
     demo: "Maquette de démonstration · données fictives · rien n'est envoyé",
     phRow1: '3 exceptions · Atelier Boréal', phRow2: 'TPS/TVQ · Café Mistral', phRow3: 'Contrôles conformes', phBtn: 'Signer la révision',
     todayTitle: "Aujourd'hui", morning: 'Bonjour', evening: 'Bonsoir',
@@ -102,6 +104,8 @@ const T = {
       ['sliders-horizontal', 'An engine you can set and check', 'Rates, ITC by account, thresholds, vendor rules: everything can change, everything is logged, and ten tie-outs can be redone by hand.'],
       ['calendar-days', 'One calendar for the whole client list', 'GST/QST, source deductions, instalments, T2/CO-17, T4/RL-1: worked out from each client profile, exportable to your calendar.'],
     ],
+    peek: { cats: [['Hydro-Québec', 'Utilities'], ['Bell', 'Phone'], ['RONA', 'Supplies']], due: 'GST/QST', dueSub: 'Café Mistral · in 8 days',
+      files: [['CM', 'Café Mistral', 'To do', 'amber'], ['TN', 'Transports Nordet', 'Ready', '']], close: 'September close' },
     demo: 'Demo mockup · fake data · nothing is sent',
     phRow1: '3 exceptions · Atelier Boréal', phRow2: 'GST/QST · Café Mistral', phRow3: 'Tie-outs pass', phBtn: 'Sign as reviewer',
     todayTitle: 'Today', morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening',
@@ -192,7 +196,7 @@ const CLIENTS = [
 
 const state = {
   lang: 'fr',
-  theme: 'dark',
+  theme: 'light',
   route: 'home',
   filter: 'action',
   open: null,
@@ -217,12 +221,12 @@ const state = {
   ],
 };
 try { // per-viewer conveniences only
-  const saved = JSON.parse(localStorage.getItem('solva-v2') || '{}');
+  const saved = JSON.parse(localStorage.getItem('solva-v3') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
   state.auto.memory = JSON.parse(localStorage.getItem('solva-memory') || '{}'); // vendors you taught Autopilot
 } catch (e) { /* storage blocked: defaults are fine */ }
-function save() { try { localStorage.setItem('solva-v2', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
+function save() { try { localStorage.setItem('solva-v3', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
 const $ = (s) => document.querySelector(s);
 const t = () => T[state.lang];
@@ -314,6 +318,7 @@ function renderShell() {
     b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
   });
   const dark = state.theme === 'dark';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#0e0d0c' : '#f6f4f0';
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
@@ -324,7 +329,17 @@ function renderShell() {
 }
 
 function renderHome() {
-  $('#how').innerHTML = t().benefits.map(([ic, b, p]) => `<li><span class="ic"><i data-lucide="${ic}"></i></span><div><b>${b}</b><p>${p}</p></div></li>`).join('');
+  const pk = t().peek;
+  const due = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 8);
+  const peeks = [ // a small look at each screen, fake data
+    pk.cats.map(([v, c]) => `<span><i data-lucide="circle-check"></i><em>${v}</em><span class="muted">${c}</span></span>`).join(''),
+    `<span class="due"><span class="date"><b>${due.getDate()}</b><small>${due.toLocaleDateString(loc(), { month: 'short' }).replace('.', '')}</small></span>
+      <span><b>${pk.due}</b><small class="muted">${pk.dueSub}</small></span></span>`,
+    pk.files.map(([a, n, st, c]) => `<span><span class="avatar">${a}</span><em>${n}</em><span class="pill ${c}">${st}</span></span>`).join(''),
+    `<span class="bar-row"><span>${pk.close}</span><span class="num">3 / 5</span></span><span class="progress"><span style="width:60%"></span></span>`,
+  ];
+  $('#how').innerHTML = t().benefits.map(([ic, b, p], i) => `<li><div class="peek" aria-hidden="true">${peeks[i]}</div>
+    <div><b><i data-lucide="${ic}"></i>${b}</b><p>${p}</p></div></li>`).join('');
   $('#phDate').textContent = TODAY.toLocaleDateString(loc(), { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
@@ -336,13 +351,15 @@ function renderToday() {
   $('#todayCount').textContent = left || '✓';
   $('#todayLine').textContent = t().leftToday(left);
   $('#ring').style.strokeDashoffset = 314.16 * (left / TASKS.length);
-  $('#tasks').innerHTML = [...TASKS].sort((a, b) => a.done() - b.done()).map((x) => {
+  // late first, done last; only the first open task gets the filled button (one primary per screen)
+  const rank = (x) => (x.done() ? 2 : x.tone === 'red' ? 0 : 1);
+  $('#tasks').innerHTML = [...TASKS].sort((a, b) => rank(a) - rank(b)).map((x, i) => {
     const [tag, title, desc, btn] = t().tasks[x.id];
     const done = x.done();
     return `<li class="card task ${done ? 'done' : ''}">
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
-      <button class="btn ${done ? '' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
+      <button class="btn ${done ? '' : i ? 'soft' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
         <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : x.id === 'review' ? 'shield-check' : x.id === 'week' ? 'calendar-days' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }
