@@ -1,4 +1,4 @@
-// Solva · public accounting firm screens: engagements, client requests (PBC), the "More" index, and Today's firm tasks.
+// Folio · public accounting firm screens: engagements, client requests (PBC), the "More" index, and Today's firm tasks.
 // Loaded before app.js (after firm-data.js and firm-i18n*.js); runs at render time.
 const engOf = (id) => state.firm.eng.find((e) => e.id === id);
 const clientOf = (e) => CLIENTS.find((c) => c.id === e.client) || { name: e.client, short: e.client };

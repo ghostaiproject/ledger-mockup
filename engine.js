@@ -1,4 +1,4 @@
-// Solva autopilot: feed it a bank export and an invoice list, it does the bookkeeping and hands back the output.
+// Folio autopilot: feed it a bank export and an invoice list, it does the bookkeeping and hands back the output.
 // Pure functions, no network. app.js runs it in a Web Worker (falls back to the page); node can require it for tests.
 (function (root) {
   'use strict';
@@ -404,6 +404,6 @@
 
   const api = { run, sample, exportsFor, ACCOUNTS, ITC, DEFAULTS, settingsOf, compile, fold, filingDue, parseCSV, num, isoDate, split };
   if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.SolvaEngine = api;
+  else root.FolioEngine = api;
   if (typeof importScripts === 'function' && typeof document === 'undefined') root.onmessage = (e) => root.postMessage(run(e.data));
 })(typeof self !== 'undefined' ? self : this);

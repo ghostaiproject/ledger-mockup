@@ -1,4 +1,4 @@
-// Solva · public accounting firm data: staff, engagements, time, client requests (PBC) and one year-end file.
+// Folio · public accounting firm data: staff, engagements, time, client requests (PBC) and one year-end file.
 // Loaded before app.js; fake firm, fake figures. Due dates are days from today so the mock never goes stale.
 const STAFF = [
   { id: 'MB', name: 'Marie Bélanger', role: { fr: 'Associée, CPA', en: 'Partner, CPA' }, rate: 225 },

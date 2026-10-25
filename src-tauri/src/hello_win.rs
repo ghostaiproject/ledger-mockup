@@ -36,7 +36,7 @@ fn raise_dialog() {
 }
 
 fn sign(cred: &KeyCredential, challenge: &[u8]) -> Result<Vec<u8>, String> {
-    let msg = [b"solva-hello/v1\0".as_slice(), challenge].concat();
+    let msg = [b"folio-hello/v1\0".as_slice(), challenge].concat();
     let buf = CryptographicBuffer::CreateFromByteArray(&msg).map_err(|e| e.to_string())?;
     raise_dialog();
     let r = cred.RequestSignAsync(&buf).and_then(|op| op.join()).map_err(|e| e.to_string())?;

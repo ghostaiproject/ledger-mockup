@@ -863,6 +863,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
+name = "folio"
+version = "0.1.0"
+dependencies = [
+ "aes-gcm",
+ "argon2",
+ "hex",
+ "hkdf",
+ "hmac",
+ "rand",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tauri",
+ "tauri-build",
+ "windows",
+ "zeroize",
+]
+
+[[package]]
 name = "foreign-types"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3010,25 +3029,6 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "solva"
-version = "0.1.0"
-dependencies = [
- "aes-gcm",
- "argon2",
- "hex",
- "hkdf",
- "hmac",
- "rand",
- "serde",
- "serde_json",
- "sha2",
- "tauri",
- "tauri-build",
- "windows",
- "zeroize",
 ]
 
 [[package]]

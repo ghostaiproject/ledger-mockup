@@ -1,4 +1,4 @@
-/* Solva · firm screens (engagements, year-end file, requests, time) + the computer-first layout. Loaded after desk.css. */
+/* Folio · firm screens (engagements, year-end file, requests, time) + the computer-first layout. Loaded after desk.css. */
 .nav a.phone-only { display: flex; }
 .nav .nav-h { display: none; }
 .avatar.sm { width: 30px; height: 30px; font-size: 12px; }

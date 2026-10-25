@@ -1,4 +1,4 @@
-# Solva app · Tauri 2 plan (Next 1)
+# Folio app · Tauri 2 plan (Next 1)
 
 Goal: one codebase → GitHub Pages demo (unchanged) + Windows .msi/.exe + Android .apk with
 encrypted local storage and encrypted sync to the user's own cloud drive.
@@ -80,7 +80,7 @@ AES-256-GCM sealed (AAD = its path), file names are HMAC(key, name), writes are 
 order. Temporary key: `vault.dev.key`, debug builds only; release refuses to open (shows the reason).
 First run in the app = demo seeds (until onboarding in step 4: empty + "load sample").
 `npm run check` = engine test + Rust tests + debug build + `tools/app_check.mjs` (restart survives,
-no readable data on disk; uses a throwaway `SOLVA_DATA_DIR`).
+no readable data on disk; uses a throwaway `FOLIO_DATA_DIR`).
 
 ## 4. Keys and unlock (Next 3)
 
@@ -107,7 +107,7 @@ for the lock/onboarding screens. Passphrase unlock on a device with no wrap re-w
 
 ## 5. Disk format (Next 2)
 
-App data dir (`%APPDATA%\ca.solva.app`, Android internal storage):
+App data dir (`%APPDATA%\ca.folio.app`, Android internal storage):
 ```
 vault.local.json            device-wrapped DEK, device id, settings
 rec/<col>/<id>.enc          one sealed JSON per record

@@ -1,4 +1,4 @@
-/* Solva store: the one save/load API the screens use (docs/APP-PLAN.md §3).
+/* Folio store: the one save/load API the screens use (docs/APP-PLAN.md §3).
    Web (GitHub Pages) = demo: firm data lives in memory and resets on reload; only the accountant's own
    settings (Autopilot memory, engine settings, reminders) stay in this browser, as before.
    App (Tauri) = every record and document sealed on the device through store-native.js (Rust side). */
@@ -11,7 +11,7 @@ const Store = (() => {
   const subs = [];
   let last = 0;
   const dev = (() => {
-    try { let d = localStorage.getItem('solva-dev'); if (!d) { d = Math.random().toString(36).slice(2, 10); localStorage.setItem('solva-dev', d); } return d; } catch (e) { return 'web'; }
+    try { let d = localStorage.getItem('folio-dev'); if (!d) { d = Math.random().toString(36).slice(2, 10); localStorage.setItem('folio-dev', d); } return d; } catch (e) { return 'web'; }
   })();
   const clock = () => (last = Math.max(Date.now(), last + 1)); // hybrid clock: never goes back, never repeats
   const kept = (r) => KEEP.has(r.col) || KEEP.has(`${r.col}/${r.id}`);
@@ -39,7 +39,7 @@ const Store = (() => {
     } catch (e) { /* defaults are fine */ }
   }
   async function bootNative() {
-    await StoreNative.open();
+    await StoreNative.whenOpen();
     (await StoreNative.load()).forEach((r) => { recs.set(`${r.col}/${r.id}`, r); last = Math.max(last, r.at); });
   }
   function saved(r) { if (StoreNative) StoreNative.save(r); else if (kept(r)) persist(); }

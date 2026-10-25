@@ -1,11 +1,11 @@
 [package]
-name = "solva"
+name = "folio"
 version = "0.1.0"
-description = "Solva: CPA-firm workbench"
+description = "Folio: CPA-firm workbench"
 edition = "2021"
 
 [lib]
-name = "solva_lib"
+name = "folio_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -26,3 +26,9 @@ hkdf = "0.12"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = ["Foundation", "Security_Credentials", "Security_Cryptography", "Storage_Streams", "Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
+
+# Argon2id (64 MB, 3 passes) is far too slow unoptimized: keep debug builds' unlock time close to release
+[profile.dev.package.argon2]
+opt-level = 3
+[profile.dev.package.blake2]
+opt-level = 3

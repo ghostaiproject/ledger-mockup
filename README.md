@@ -1,4 +1,4 @@
-# Solva
+# Folio
 
 Phone-first mock of an accountant's workbench for a Québec firm (cabinet comptable): Autopilot prepares the books,
 the accountant reviews every decision with its reason, tunes the engine, signs off, and files on time. Black and white, walnut brown, pale mint #DAF1DE; light by default. Bilingual FR-CA / EN-CA, light and dark.
@@ -7,7 +7,7 @@ Live: https://ghostaiproject.github.io/ledger-mockup/
 Built with the `webd` skill (Ghostskills). Static HTML/CSS/JS, fake data, nothing is filed or sent.
 
 Screens (one page, hash routes):
-- `#/` landing page: what Solva does, "Open my dashboard"
+- `#/` landing page: what Folio does, "Open my dashboard"
 - `#/today`: what's left to do today, one button per task
 - `#/auto`: **Autopilot**: drop a bank statement + invoice list (CSV), it does the bookkeeping (see below)
 - `#/review`: **Review**: every bank line with its method (rule, learned, matched invoice, by hand), its reason and a confidence score;

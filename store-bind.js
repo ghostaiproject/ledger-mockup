@@ -27,8 +27,12 @@ const Bind = (() => {
   function remember(col, id, data) { lastJson.set(`${col}/${id}`, JSON.stringify(data)); }
 
   async function load() {
+    // app first run: 'empty' or 'sample' from the first-run screen (vault-ui.js); no record yet = sample
+    const picked = Store.native && StoreNative.firstStart();
+    if (picked) await Store.put('one', 'start', picked);
+    const empty = (await Store.get('one', 'start')) === 'empty';
     for (const [col, get] of Object.entries(LISTS)) {
-      if (!Store.seen(col)) continue; // nothing stored yet: keep the seed (web demo) as is
+      if (!Store.seen(col)) { if (empty) get().length = 0; continue; } // nothing stored yet: seed, or empty firm
       const arr = get(), recs = await Store.all(col);
       arr.splice(0, arr.length, ...recs);
     }

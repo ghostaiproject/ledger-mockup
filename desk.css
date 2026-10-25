@@ -1,4 +1,4 @@
-/* Solva desk: review, engine settings, calendar, guided tour. Same tokens as style.css. */
+/* Folio desk: review, engine settings, calendar, guided tour. Same tokens as style.css. */
 :root { --k-tax: var(--ring); --hover: rgba(138, 98, 68, .1); }
 [data-theme="dark"] { --hover: rgba(218, 241, 222, .08); }
 

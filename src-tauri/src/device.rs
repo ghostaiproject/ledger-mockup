@@ -1,12 +1,12 @@
 // The device key that wraps the DEK (docs/APP-PLAN.md §4). The secret it gives back is the same every time for the same
 // name + challenge, and only after the user proves presence (fingerprint, face or PIN).
 // - "hello": Windows Hello key credential (hello_win.rs)
-// - "file": debug builds with SOLVA_DEVICE=file (and cargo tests) only: a plain key file, so checks run without a prompt
+// - "file": debug builds with FOLIO_DEVICE=file (and cargo tests) only: a plain key file, so checks run without a prompt
 // - Android Keystore comes with the Kotlin plugin (Next 3); until then Android opens with the passphrase only
 use std::path::Path;
 
 fn file_mode() -> bool {
-    cfg!(test) || (cfg!(debug_assertions) && std::env::var("SOLVA_DEVICE").is_ok_and(|v| v == "file"))
+    cfg!(test) || (cfg!(debug_assertions) && std::env::var("FOLIO_DEVICE").is_ok_and(|v| v == "file"))
 }
 
 pub fn kind(_dir: &Path) -> Option<&'static str> {

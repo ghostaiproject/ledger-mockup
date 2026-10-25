@@ -1,4 +1,4 @@
-// Solva native shell: vault (DEK wrapped by device key + passphrase), encrypted records + documents (docs/APP-PLAN.md).
+// Folio native shell: vault (DEK wrapped by device key + passphrase), encrypted records + documents (docs/APP-PLAN.md).
 mod crypt;
 mod device;
 mod disk;
@@ -104,7 +104,7 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             // debug builds can run on a throwaway folder (tools/app_check.mjs); release always uses the app data dir
-            let test_dir = std::env::var_os("SOLVA_DATA_DIR").filter(|_| cfg!(debug_assertions));
+            let test_dir = std::env::var_os("FOLIO_DATA_DIR").filter(|_| cfg!(debug_assertions));
             let dir = match test_dir {
                 Some(d) => std::path::PathBuf::from(d),
                 None => app.path().app_data_dir()?,
@@ -114,5 +114,5 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![app_info, vault_status, vault_create, vault_unlock, vault_lock, rec_all, rec_put, doc_add, doc_open, doc_list, doc_del])
         .run(tauri::generate_context!())
-        .expect("error while running Solva");
+        .expect("error while running Folio");
 }

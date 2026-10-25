@@ -1,11 +1,11 @@
-// Solva: phone-first mock of an accountant's workbench for a Québec firm (desk.js adds review, engine settings and the calendar). Fake clients and figures; nothing is filed or sent anywhere.
+// Folio: phone-first mock of an accountant's workbench for a Québec firm (desk.js adds review, engine settings and the calendar). Fake clients and figures; nothing is filed or sent anywhere.
 const T = {
   fr: {
-    home: 'Accueil Solva', language: 'Langue', sections: 'Sections', dark: 'Mode sombre', light: 'Mode clair',
+    home: 'Accueil Folio', language: 'Langue', sections: 'Sections', dark: 'Mode sombre', light: 'Mode clair',
     nav: { today: "Aujourd'hui", calendar: 'Calendrier', clients: 'Clients', auto: 'Pilote auto', review: 'Révision', money: 'Argent', close: 'Fin de mois', engine: 'Moteur', deadlines: 'Échéances' },
     kicker: 'Pour les CPA et les cabinets comptables du Québec',
     landTitle: 'Du relevé bancaire aux états financiers signés.',
-    landLead: "Solva suit chaque mandat du cabinet : tenue de livres, missions de compilation et d’examen, T2/CO-17 et T1/TP-1. Le pilote auto prépare, le réviseur vérifie, l’associée signe. Temps, TEC et échéances ARC et Revenu Québec du portefeuille au même endroit.",
+    landLead: "Folio suit chaque mandat du cabinet : tenue de livres, missions de compilation et d’examen, T2/CO-17 et T1/TP-1. Le pilote auto prépare, le réviseur vérifie, l’associée signe. Temps, TEC et échéances ARC et Revenu Québec du portefeuille au même endroit.",
     open: 'Voir ma journée', how: 'Comment ça marche',
     benefits: [
       ['wand-sparkles', 'Le pilote auto prépare, tu révises', 'Relevé et factures en entrée : classement, rapprochement, TPS/TVQ, écritures. Seules les exceptions te reviennent.'],
@@ -35,11 +35,11 @@ const T = {
     tasks: {
       review: ['Révision', 'Réviser et signer le dossier', (c) => `${c} · exceptions, contrôles et signatures du préparateur et du réviseur.`, 'Ouvrir la révision'],
       week: ['Cette semaine', 'Échéances des 7 prochains jours', (n) => `${n} à produire pour tes clients · voir le calendrier`, 'Ouvrir le calendrier'],
-      auto: ['Pilote auto', 'Faire les livres du mois', (c) => `${c} · dépose le relevé et les factures, Solva fait le reste.`, 'Ouvrir le pilote auto'],
+      auto: ['Pilote auto', 'Faire les livres du mois', (c) => `${c} · dépose le relevé et les factures, Folio fait le reste.`, 'Ouvrir le pilote auto'],
       payroll: ['Fait', 'Inscrire les paies de la semaine', () => 'Fait ce matin, 7 employés', ''],
       late: ['En retard', 'Produire la TPS/TVQ de Café Mistral', (d) => `Taxes de vente du mois dernier · ${d} jours de retard`, "C'est fait"],
       remind: ['À relancer', 'Relancer Transports Nordet', (a) => `Facture H-2291 · ${a} impayée depuis 47 jours`, 'Envoyer un rappel'],
-      match: ['Banque', 'Relier les opérations bancaires', (n) => `${n} paiements à relier à leur facture. Solva peut le faire pour toi.`, 'Relier pour moi'],
+      match: ['Banque', 'Relier les opérations bancaires', (n) => `${n} paiements à relier à leur facture. Folio peut le faire pour toi.`, 'Relier pour moi'],
     },
     toastFiled: 'Marqué comme produit', toastRemind: (c) => `Rappel envoyé à ${c}`, toastMatch: (n, r) => `${n} opérations reliées · ${r} à vérifier`,
     toastMatched: 'Banque à jour', toastAsk: (c) => `Demande envoyée à ${c}`, toastReady: (c) => `${c} est prêt`, toastClose: 'Fin de mois bouclée. Bravo !',
@@ -92,11 +92,11 @@ const T = {
     },
   },
   en: {
-    home: 'Solva home', language: 'Language', sections: 'Sections', dark: 'Dark mode', light: 'Light mode',
+    home: 'Folio home', language: 'Language', sections: 'Sections', dark: 'Dark mode', light: 'Light mode',
     nav: { today: 'Today', calendar: 'Calendar', clients: 'Clients', auto: 'Autopilot', review: 'Review', money: 'Money', close: 'Month-end', engine: 'Engine', deadlines: 'Deadlines' },
     kicker: 'For Québec CPAs and accounting firms',
     landTitle: 'From bank statement to signed financial statements.',
-    landLead: 'Solva runs every engagement in the firm: bookkeeping, compilation and review engagements, T2/CO-17 and T1/TP-1. Autopilot prepares, the reviewer checks, the partner signs. Time, WIP and every CRA and Revenu Québec date for the portfolio in one place.',
+    landLead: 'Folio runs every engagement in the firm: bookkeeping, compilation and review engagements, T2/CO-17 and T1/TP-1. Autopilot prepares, the reviewer checks, the partner signs. Time, WIP and every CRA and Revenu Québec date for the portfolio in one place.',
     open: 'See my day', how: 'How it works',
     benefits: [
       ['wand-sparkles', 'Autopilot prepares, you review', 'Statement and invoices in: sorting, matching, GST/QST, journal entries. Only the exceptions come back to you.'],
@@ -126,11 +126,11 @@ const T = {
     tasks: {
       review: ['Review', 'Review and sign off the file', (c) => `${c} · exceptions, tie-outs, preparer and reviewer sign-off.`, 'Open the review'],
       week: ['This week', 'Deadlines in the next 7 days', (n) => `${n} to file for your clients · see the calendar`, 'Open the calendar'],
-      auto: ['Autopilot', "Do this month's books", (c) => `${c} · drop the statement and invoices, Solva does the rest.`, 'Open Autopilot'],
+      auto: ['Autopilot', "Do this month's books", (c) => `${c} · drop the statement and invoices, Folio does the rest.`, 'Open Autopilot'],
       payroll: ['Done', "Record this week's payroll", () => 'Done this morning, 7 employees', ''],
       late: ['Late', 'File the GST/QST for Café Mistral', (d) => `Last month's sales tax · ${d} days late`, 'Mark as filed'],
       remind: ['Follow up', 'Follow up with Transports Nordet', (a) => `Invoice H-2291 · ${a} unpaid for 47 days`, 'Send a reminder'],
-      match: ['Bank', 'Match bank transactions', (n) => `${n} payments to link to their invoice. Solva can do it for you.`, 'Match them for me'],
+      match: ['Bank', 'Match bank transactions', (n) => `${n} payments to link to their invoice. Folio can do it for you.`, 'Match them for me'],
     },
     toastFiled: 'Marked as filed', toastRemind: (c) => `Reminder sent to ${c}`, toastMatch: (n, r) => `${n} matched · ${r} to check`,
     toastMatched: 'Bank up to date', toastAsk: (c) => `Request sent to ${c}`, toastReady: (c) => `${c} is ready`, toastClose: 'Month closed. Well done!',
@@ -311,7 +311,7 @@ function renderShell() {
   document.documentElement.lang = loc();
   document.documentElement.dataset.theme = state.theme;
   document.documentElement.classList.toggle('is-home', state.route === 'home');
-  document.title = state.route === 'home' ? 'Solva' : `${t().nav[state.route]} · Solva`;
+  document.title = state.route === 'home' ? 'Folio' : `${t().nav[state.route]} · Folio`;
   document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t()[el.dataset.i18n]; });
   document.querySelectorAll('[data-i18n-tp]').forEach((el) => { el.textContent = getP(tp(), el.dataset.i18nTp); });
   document.querySelectorAll('[data-i18n-label]').forEach((el) => el.setAttribute('aria-label', t()[el.dataset.i18nLabel]));
@@ -455,7 +455,7 @@ function renderClose() {
 /* ---------- autopilot screen ---------- */
 const STEPS = ['read', 'sort', 'match', 'tax', 'journal', 'check'];
 const owedTotal = (r) => r.owed.reduce((s, o) => s + o.left, 0);
-const acctName = (a) => SolvaEngine.ACCOUNTS[a][state.lang === 'en' ? 1 : 0];
+const acctName = (a) => FolioEngine.ACCOUNTS[a][state.lang === 'en' ? 1 : 0];
 const periodName = (p) => new Date(+p.slice(0, 4), +p.slice(5, 7) - 1, 1).toLocaleDateString(loc(), { month: 'long', year: 'numeric' });
 const kv = (k, v, cls = '') => `<li class="${cls}"><span>${k}</span><b class="num">${v}</b></li>`;
 const more = (id, title, body) => `<details class="card more" data-more="${id}" ${state.auto.open.includes(id) ? 'open' : ''}><summary>${title}</summary>${body}</details>`;
@@ -463,7 +463,7 @@ function reviewCard(x) {
   const A = t().auto, [text, opts] = A.rv[x.type];
   const head = x.tx ? `<b>${esc(x.tx.desc)}</b><small>${day(x.tx.date)} · <span class="num">${cents(x.tx.amount)}</span></small>` : '';
   const acts = x.type === 'unknown'
-    ? `<div class="pick"><label class="field"><span>${A.account}</span><select id="acct-${esc(x.id)}">${[...Object.keys(SolvaEngine.ACCOUNTS).filter((a) => a >= 5000), '1500']
+    ? `<div class="pick"><label class="field"><span>${A.account}</span><select id="acct-${esc(x.id)}">${[...Object.keys(FolioEngine.ACCOUNTS).filter((a) => a >= 5000), '1500']
       .map((a) => `<option value="${a}">${a} · ${acctName(a)}</option>`).join('')}</select></label>
       <button class="btn primary" data-decide="${esc(x.id)}">${A.save}</button></div>`
     : `<div class="acts">${opts.map(([label], i) => `<button class="btn ${i ? 'soft' : 'primary'}" data-decide="${esc(x.id)}" data-opt="${i}">${label}</button>`).join('')}</div>`;
@@ -555,10 +555,10 @@ function match() {
 let worker = null;
 try { worker = new Worker($('script[src^="engine.js"]').getAttribute('src')); } catch (e) { /* file:// or no workers: it runs in the page instead */ }
 function engine(input) {
-  if (!worker) return Promise.resolve(SolvaEngine.run(input));
+  if (!worker) return Promise.resolve(FolioEngine.run(input));
   return new Promise((done) => {
     worker.onmessage = (e) => done(e.data);
-    worker.onerror = (e) => { e.preventDefault(); worker = null; done(SolvaEngine.run(input)); };
+    worker.onerror = (e) => { e.preventDefault(); worker = null; done(FolioEngine.run(input)); };
     worker.postMessage(input);
   });
 }
@@ -602,7 +602,7 @@ async function decide(id, opt) {
 }
 function saveMemory() { Bind.flush(); } // vendors you taught Autopilot: saved through the store
 function download(kind) {
-  const r = state.auto.result, file = SolvaEngine.exportsFor(r, state.lang)[kind];
+  const r = state.auto.result, file = FolioEngine.exportsFor(r, state.lang)[kind];
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([file], { type: 'text/csv;charset=utf-8' }));
   link.download = `${state.auto.client}-${r.period}-${kind}.csv`;
@@ -714,5 +714,5 @@ window.addEventListener('hashchange', () => route(false));
 Store.ready().then(Bind.load).then(() => { route(true); document.documentElement.classList.remove('booting'); })
   .catch((e) => { // app only: vault could not open (lock screen comes with the device-key vault)
     document.documentElement.classList.remove('booting');
-    document.body.innerHTML = `<main class="vault-err"><h1>Solva</h1><p>${String(e).replace(/</g, '&lt;')}</p></main>`;
+    document.body.innerHTML = `<main class="vault-err"><h1>Folio</h1><p>${String(e).replace(/</g, '&lt;')}</p></main>`;
   });

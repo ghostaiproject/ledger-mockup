@@ -116,7 +116,7 @@ mod tests {
 
     #[test]
     fn records_and_docs_survive_reopen() {
-        let dir = std::env::temp_dir().join(format!("solva-test-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("folio-test-{}", std::process::id()));
         let key = crypt::random_key();
         let again: Key = zeroize::Zeroizing::new(*key);
         let d = Disk::new(dir.clone(), key);

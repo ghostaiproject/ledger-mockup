@@ -1,4 +1,4 @@
-// Solva · firm screens, English (EN-CA). Same keys as TF.fr in firm-i18n.js.
+// Folio · firm screens, English (EN-CA). Same keys as TF.fr in firm-i18n.js.
 TF.en = {
   navGroups: ['Firm', 'Files', 'Clients and books'],
   nav: { engagements: 'Engagements', yearend: 'Year-end', requests: 'Requests', time: 'Time', more: 'More' },
@@ -35,7 +35,7 @@ TF.en = {
     views: { tb: 'Trial balance', aje: 'Entries', lead: 'Lead sheets', fs: 'Financial statements' },
     cols: { acct: 'Account', unadj: 'Unadjusted', adj: 'Adj.', final: 'Adjusted', py: '2025', varc: 'Change' },
     balanced: 'Trial balance in balance', unbalanced: (d) => `Out by ${d}`, totals: 'Totals',
-    ajeLead: 'Entries Solva proposes from the file. Accept, reject or add your own.',
+    ajeLead: 'Entries Folio proposes from the file. Accept, reject or add your own.',
     accept: 'Accept', reject: 'Reject', reopen: 'Reopen', accepted: 'Accepted', rejected: 'Rejected', proposed: 'Proposed',
     addAje: 'Add an entry', dr: 'Debit', cr: 'Credit', amt: 'Amount', desc: 'Description', addBtn: 'Add',
     leadLead: 'Each statement line next to last year. Changes over 10% and over $5,000 need an explanation.', explain: 'Explain',
@@ -57,7 +57,7 @@ TF.en = {
     letter: ['Engagement', 'Engagement letter to get signed', () => 'Atelier Boréal · 2026 review engagement', 'Open the engagement'],
     wip: ['Billing', 'WIP to bill', (a) => `${a} of unbilled work in progress`, 'Open time'],
   },
-  more: { title: 'All of Solva', lead: 'Every section of the firm.' },
+  more: { title: 'All of Folio', lead: 'Every section of the firm.' },
   moreDesc: { engagements: 'Stage, team and budget of each engagement', yearend: 'Trial balance, entries, statements', requests: 'Documents to get from clients', time: 'Hours, WIP and invoices', clients: 'The portfolio and tax profile', auto: 'Bookkeeping from the bank statement', review: 'Exceptions, tie-outs, sign-offs', calendar: 'CRA and Revenu Québec deadlines', money: 'The firm’s receivables', close: 'Client month-end', engine: 'Autopilot settings' },
 };
 const tf = () => TF[state.lang];

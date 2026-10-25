@@ -72,7 +72,7 @@ fn pass_key(pass: &str, salt: &[u8], c: Cost) -> Result<Key, String> {
 
 fn dev_key(secret: &[u8], salt: &[u8]) -> Key {
     let mut k = Zeroizing::new([0u8; 32]);
-    Hkdf::<Sha256>::new(Some(salt), secret).expand(b"solva-device-wrap/v1", k.as_mut()).expect("32 bytes");
+    Hkdf::<Sha256>::new(Some(salt), secret).expand(b"folio-device-wrap/v1", k.as_mut()).expect("32 bytes");
     k
 }
 
@@ -110,7 +110,7 @@ pub fn create(dir: &Path, pass: &str, cost: Cost) -> Result<Key, String> {
     let id = rand_hex(8);
     let salt = rand_hex(16);
     let wrap = pass_key(pass, &hex::decode(&salt).unwrap(), cost)?;
-    let dek_hex = hex::encode(crypt::seal(&wrap, dek.as_ref(), format!("solva-vault/{id}/pass").as_bytes()));
+    let dek_hex = hex::encode(crypt::seal(&wrap, dek.as_ref(), format!("folio-vault/{id}/pass").as_bytes()));
     write(dir, SHARED, &PassWrap { v: 1, id: id.clone(), alg: "argon2id".into(), cost, salt, dek: dek_hex })?;
     if device::kind(dir).is_some() {
         add_device(dir, &id, &dek)?;
@@ -121,10 +121,10 @@ pub fn create(dir: &Path, pass: &str, cost: Cost) -> Result<Key, String> {
 
 fn add_device(dir: &Path, id: &str, dek: &Key) -> Result<(), String> {
     let kind = device::kind(dir).ok_or("no device key here")?;
-    let (salt, name) = (rand_hex(16), format!("Solva vault {id}"));
+    let (salt, name) = (rand_hex(16), format!("Folio vault {id}"));
     let secret = device::create(dir, &name, salt.as_bytes())?;
     let wrap = dev_key(&secret, salt.as_bytes());
-    let dek_hex = hex::encode(crypt::seal(&wrap, dek.as_ref(), format!("solva-vault/{id}/{kind}").as_bytes()));
+    let dek_hex = hex::encode(crypt::seal(&wrap, dek.as_ref(), format!("folio-vault/{id}/{kind}").as_bytes()));
     write(dir, LOCAL, &DevWrap { v: 1, id: id.into(), kind: kind.into(), name, salt, dek: dek_hex })
 }
 
@@ -132,7 +132,7 @@ fn add_device(dir: &Path, id: &str, dek: &Key) -> Result<(), String> {
 pub fn open_device(dir: &Path) -> Result<Key, String> {
     let w: DevWrap = read(dir, LOCAL).ok_or("this device has no key for the vault yet: use the passphrase")?;
     let secret = device::secret(dir, &w.name, w.salt.as_bytes())?;
-    unwrap_dek(&dev_key(&secret, w.salt.as_bytes()), &w.dek, &format!("solva-vault/{}/{}", w.id, w.kind))
+    unwrap_dek(&dev_key(&secret, w.salt.as_bytes()), &w.dek, &format!("folio-vault/{}/{}", w.id, w.kind))
         .map_err(|_| "the device key changed: use the passphrase".to_string())
 }
 
@@ -140,7 +140,7 @@ pub fn open_device(dir: &Path) -> Result<Key, String> {
 pub fn open_pass(dir: &Path, pass: &str) -> Result<Key, String> {
     let w: PassWrap = read(dir, SHARED).ok_or("no vault.json here")?;
     let salt = hex::decode(&w.salt).map_err(|e| e.to_string())?;
-    let dek = unwrap_dek(&pass_key(pass, &salt, w.cost)?, &w.dek, &format!("solva-vault/{}/pass", w.id))
+    let dek = unwrap_dek(&pass_key(pass, &salt, w.cost)?, &w.dek, &format!("folio-vault/{}/pass", w.id))
         .map_err(|_| "wrong passphrase".to_string())?;
     if !status(dir).1 && device::kind(dir).is_some() {
         let _ = add_device(dir, &w.id, &dek); // optional: a cancelled Hello prompt still unlocks
@@ -154,7 +154,7 @@ mod tests {
     const FAST: Cost = Cost { m: 256, t: 1, p: 1 };
 
     fn tmp(tag: &str) -> std::path::PathBuf {
-        let d = std::env::temp_dir().join(format!("solva-vault-{tag}-{}", std::process::id()));
+        let d = std::env::temp_dir().join(format!("folio-vault-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&d);
         d
     }

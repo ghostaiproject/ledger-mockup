@@ -1,8 +1,8 @@
 {
-  "name": "solva",
+  "name": "folio",
   "version": "0.1.0",
   "private": true,
-  "description": "Solva desktop/Android app (Tauri 2). The web demo needs none of this.",
+  "description": "Folio desktop/Android app (Tauri 2). The web demo needs none of this.",
   "scripts": {
     "web": "node tools/build_web.mjs",
     "tauri": "tauri",
