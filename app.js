@@ -13,6 +13,8 @@ const T = {
       ['users', "Tes clients, d'un coup d'œil", 'Qui doit envoyer des documents, qui est prêt. En mots simples, pas en tableaux.'],
       ['list-checks', 'La fin de mois, pas à pas', 'Une liste à cocher. Une étape à la fois.'],
     ],
+    peek: { cats: [['Hydro-Québec', 'Électricité'], ['Bell', 'Téléphone'], ['RONA', 'Matériel']], due: 'TPS/TVQ', dueSub: 'Café Mistral · dans 8 jours',
+      files: [['CM', 'Café Mistral', 'À faire', 'amber'], ['TN', 'Transports Nordet', 'Prêt', '']], close: 'Fin de septembre' },
     demo: "Maquette de démonstration · données fictives · rien n'est envoyé",
     phRow1: 'TPS/TVQ · Café Mistral', phRow2: 'Relancer Transports Nordet', phRow3: 'Relier la banque', phBtn: "C'est fait",
     todayTitle: "Aujourd'hui", morning: 'Bonjour', evening: 'Bonsoir',
@@ -99,6 +101,8 @@ const T = {
       ['users', 'Your clients at a glance', 'Who owes you documents, who is ready. In plain words, not spreadsheets.'],
       ['list-checks', 'Month-end, step by step', 'One checklist. One step at a time.'],
     ],
+    peek: { cats: [['Hydro-Québec', 'Utilities'], ['Bell', 'Phone'], ['RONA', 'Supplies']], due: 'GST/QST', dueSub: 'Café Mistral · in 8 days',
+      files: [['CM', 'Café Mistral', 'To do', 'amber'], ['TN', 'Transports Nordet', 'Ready', '']], close: 'September close' },
     demo: 'Demo mockup · fake data · nothing is sent',
     phRow1: 'GST/QST · Café Mistral', phRow2: 'Follow up Transports Nordet', phRow3: 'Match the bank', phBtn: 'Done',
     todayTitle: 'Today', morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening',
@@ -186,7 +190,7 @@ const CLIENTS = [
 
 const state = {
   lang: 'fr',
-  theme: 'dark',
+  theme: 'light',
   route: 'home',
   filter: 'action',
   open: null,
@@ -211,12 +215,12 @@ const state = {
   ],
 };
 try { // per-viewer conveniences only
-  const saved = JSON.parse(localStorage.getItem('solva-v2') || '{}');
+  const saved = JSON.parse(localStorage.getItem('solva-v3') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
   state.auto.memory = JSON.parse(localStorage.getItem('solva-memory') || '{}'); // vendors you taught Autopilot
 } catch (e) { /* storage blocked: defaults are fine */ }
-function save() { try { localStorage.setItem('solva-v2', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
+function save() { try { localStorage.setItem('solva-v3', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
 const $ = (s) => document.querySelector(s);
 const t = () => T[state.lang];
@@ -303,6 +307,7 @@ function renderShell() {
     b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
   });
   const dark = state.theme === 'dark';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#0e1110' : '#f7f9f8';
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
@@ -313,7 +318,17 @@ function renderShell() {
 }
 
 function renderHome() {
-  $('#how').innerHTML = t().benefits.map(([ic, b, p]) => `<li><span class="ic"><i data-lucide="${ic}"></i></span><div><b>${b}</b><p>${p}</p></div></li>`).join('');
+  const pk = t().peek;
+  const due = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 8);
+  const peeks = [ // a small look at each screen, fake data
+    pk.cats.map(([v, c]) => `<span><i data-lucide="circle-check"></i><em>${v}</em><span class="muted">${c}</span></span>`).join(''),
+    `<span class="due"><span class="date"><b>${due.getDate()}</b><small>${due.toLocaleDateString(loc(), { month: 'short' }).replace('.', '')}</small></span>
+      <span><b>${pk.due}</b><small class="muted">${pk.dueSub}</small></span></span>`,
+    pk.files.map(([a, n, st, c]) => `<span><span class="avatar">${a}</span><em>${n}</em><span class="pill ${c}">${st}</span></span>`).join(''),
+    `<span class="bar-row"><span>${pk.close}</span><span class="num">3 / 5</span></span><span class="progress"><span style="width:60%"></span></span>`,
+  ];
+  $('#how').innerHTML = t().benefits.map(([ic, b, p], i) => `<li><div class="peek" aria-hidden="true">${peeks[i]}</div>
+    <div><b><i data-lucide="${ic}"></i>${b}</b><p>${p}</p></div></li>`).join('');
   $('#phDate').textContent = TODAY.toLocaleDateString(loc(), { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
@@ -325,13 +340,15 @@ function renderToday() {
   $('#todayCount').textContent = left || '✓';
   $('#todayLine').textContent = t().leftToday(left);
   $('#ring').style.strokeDashoffset = 314.16 * (left / TASKS.length);
-  $('#tasks').innerHTML = [...TASKS].sort((a, b) => a.done() - b.done()).map((x) => {
+  // late first, done last; only the first open task gets the filled button (one primary per screen)
+  const rank = (x) => (x.done() ? 2 : x.tone === 'red' ? 0 : 1);
+  $('#tasks').innerHTML = [...TASKS].sort((a, b) => rank(a) - rank(b)).map((x, i) => {
     const [tag, title, desc, btn] = t().tasks[x.id];
     const done = x.done();
     return `<li class="card task ${done ? 'done' : ''}">
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
-      <button class="btn ${done ? '' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
+      <button class="btn ${done ? '' : i ? 'soft' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
         <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }

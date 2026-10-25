@@ -1,7 +1,7 @@
 # Solva
 
 Phone-first mock app for a Québec accounting firm (cabinet comptable), made for someone who doesn't love tech:
-one clear thing per screen, big buttons, plain words, dark green. Bilingual FR-CA / EN-CA, light and dark.
+one clear thing per screen, big buttons, plain words. Pale mint (#DAF1DE) on white and ink; light by default, charcoal dark mode. Bilingual FR-CA / EN-CA, light and dark.
 Live: https://ghostaiproject.github.io/ledger-mockup/
 
 Built with the `webd` skill (Ghostskills). Static HTML/CSS/JS, fake data, nothing is filed or sent.
