@@ -75,6 +75,13 @@ Original notes:
 - Dates are `Date` objects today → store as ISO strings, revive on load.
 - Every mutation in firm.js / firm-time.js / yearend.js ends with `Store.put(...)`.
 
+Done (step 3): `src-tauri/src/{crypt,disk,vault}.rs` + `store-native.js`. Every record/document is
+AES-256-GCM sealed (AAD = its path), file names are HMAC(key, name), writes are atomic and queued in
+order. Temporary key: `vault.dev.key`, debug builds only; release refuses to open (shows the reason).
+First run in the app = demo seeds (until onboarding in step 4: empty + "load sample").
+`npm run check` = engine test + Rust tests + debug build + `tools/app_check.mjs` (restart survives,
+no readable data on disk; uses a throwaway `SOLVA_DATA_DIR`).
+
 ## 4. Keys and unlock (Next 3)
 
 - **DEK**: one random 256-bit data key per vault. Every record and document = AES-256-GCM,

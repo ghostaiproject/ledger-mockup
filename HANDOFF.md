@@ -4,7 +4,8 @@
 - Plan: `docs/APP-PLAN.md` (layout, Store API, keys/unlock, disk format, sync, CI, order of work). Decided: Google Drive first, unsigned builds for now, Windows tools local / Android in CI.
 - Scaffold: `package.json` (@tauri-apps/cli), `tools/build_web.mjs` (web files → `dist/`, stamps ?v=), `src-tauri/` (conf, Cargo, lib.rs with `app_info`, capabilities, icons from `app-icon.png` placeholder). Pages workflow untouched.
 - Toolchain on this PC: rustup stable (MSVC) + VS 2022 C++ Build Tools. Cargo is in `%USERPROFILE%\.cargo\bin` (new shells only).
-- Build: `npx tauri build --debug --no-bundle` → `src-tauri/target/debug/solva.exe`. Next: plan step 3 (Rust disk + crypt + `store-native.js`).
+- Build: `npx tauri build --debug --no-bundle` → `src-tauri/target/debug/solva.exe`. Next: plan step 4 (vault: Windows Hello device key, passphrase, lock/unlock + onboarding screens; use /crew for the screens, the `grapp` skill for defaultable choices).
+- Step 3 done: encrypted records + documents on disk (`src-tauri/src/crypt.rs`, `disk.rs`, `vault.rs` dev key, `store-native.js`). Check everything with `npm run check` (cargo on PATH: `%USERPROFILE%\.cargo\bin`).
 - Step 2 done: `store.js` (Store API, web backend: firm data in memory, own settings in localStorage `solva-store-web`, migrates old `solva-memory`/`solva-desk`) + `store-bind.js` (`render()` → `Bind.flush()` diffs and saves changed records). Checked: no errors on 15 routes × phone/desktop × light/dark; desktop dense rows (pbcAsk/pbcSt/task/eng buttons) are <44 px on main too (not new).
 - Local preview: launch config `solva-app` (port 5177) in Desktop\New folder\.claude\launch.json; 5174 is often taken.
 

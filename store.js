@@ -1,7 +1,7 @@
 /* Solva store: the one save/load API the screens use (docs/APP-PLAN.md §3).
    Web (GitHub Pages) = demo: firm data lives in memory and resets on reload; only the accountant's own
    settings (Autopilot memory, engine settings, reminders) stay in this browser, as before.
-   App (Tauri) = encrypted records on the device through store-native.js (step 3). */
+   App (Tauri) = every record and document sealed on the device through store-native.js (Rust side). */
 const NATIVE = !!window.__TAURI_INTERNALS__;
 
 const Store = (() => {
@@ -38,6 +38,10 @@ const Store = (() => {
       persist();
     } catch (e) { /* defaults are fine */ }
   }
+  async function bootNative() {
+    (await StoreNative.load()).forEach((r) => { recs.set(`${r.col}/${r.id}`, r); last = Math.max(last, r.at); });
+  }
+  function saved(r) { if (StoreNative) StoreNative.save(r); else if (kept(r)) persist(); }
   function write(col, id, data, del) {
     const k = `${col}/${id}`, old = recs.get(k);
     const r = { col, id, rev: (old ? old.rev : 0) + 1, at: clock(), born: old ? old.born : last, dev, del: !!del, json: del ? null : JSON.stringify(data) };
@@ -47,19 +51,24 @@ const Store = (() => {
 
   const api = {
     native: NATIVE,
-    ready: () => Promise.resolve(boot()).then(() => api),
-    status: () => 'open',
+    ready: () => (StoreNative ? bootNative() : Promise.resolve(boot())).then(() => api),
+    status: () => (StoreNative && StoreNative.failed ? 'error' : 'open'),
     seen: (col) => [...recs.values()].some((r) => r.col === col), // ever written (tombstones count)
     get: async (col, id) => { const r = recs.get(`${col}/${id}`); return r && !r.del ? JSON.parse(r.json, revive) : null; },
     all: async (col) => [...recs.values()].filter((r) => r.col === col && !r.del).sort((a, b) => a.born - b.born)
       .map((r) => JSON.parse(r.json, revive)),
-    put: async (col, id, data) => { const r = write(col, id, data); if (kept(r)) persist(); },
-    del: async (col, id) => { if (!recs.has(`${col}/${id}`)) return; const r = write(col, id, null, true); if (kept(r)) persist(); },
+    put: async (col, id, data) => { saved(write(col, id, data)); },
+    del: async (col, id) => { if (recs.has(`${col}/${id}`)) saved(write(col, id, null, true)); },
     on: (ev, fn) => { if (ev === 'change') subs.push(fn); }, // sync pulled new data: fn(col, id, data | null)
     emit: (col, id, data) => subs.forEach((fn) => fn(col, id, data)),
     lock: () => {},
-    // documents (bank statements, invoices, PBC docs): in memory on the web
-    doc: (() => {
+    // documents (bank statements, invoices, PBC docs): sealed on disk in the app, in memory on the web
+    doc: StoreNative ? {
+      add: (meta, bytes) => { const id = `d${clock().toString(36)}${dev}`; return StoreNative.doc.add({ ...meta, id, size: bytes.byteLength, added: new Date() }, bytes, id); },
+      open: async (id) => { const m = (await StoreNative.doc.list()).find((x) => x.id === id); return m ? StoreNative.doc.open(id, m.type) : null; },
+      list: async (filter) => (await StoreNative.doc.list()).filter((m) => !filter || Object.entries(filter).every(([k, v]) => m[k] === v)),
+      del: (id) => StoreNative.doc.del(id),
+    } : (() => {
       const docs = new Map();
       return {
         add: async (meta, bytes) => { const id = `d${clock().toString(36)}`; docs.set(id, { meta: { ...meta, id, size: bytes.byteLength, added: new Date() }, bytes }); return id; },
