@@ -1,11 +1,18 @@
 # Solva
 
-Mock dashboard for a small Québec accounting firm (cabinet comptable): CRA / Revenu Québec deadlines,
-client files, month-end close, aging, fees to chase, bank reconciliation, and a "Firm Pulse" score.
-Bilingual FR-CA / EN-CA, day and night themes. Static HTML/CSS/JS, fake data, nothing is filed or sent.
+Phone-first mock app for a Québec accounting firm (cabinet comptable), made for someone who doesn't love tech:
+one clear thing per screen, big buttons, plain words, dark green. Bilingual FR-CA / EN-CA, light and dark.
+Built with the `webd` skill (Ghostskills). Static HTML/CSS/JS, fake data, nothing is filed or sent.
 
-Deadline dates follow the real rules (15th for source deductions, month after quarter end for GST/QST,
-weekends move to the next business day) and are computed from today's date.
+Screens (one page, hash routes):
+- `#/` landing page: what Solva does, "Open my dashboard"
+- `#/today`: what's left to do today, one button per task
+- `#/deadlines`: CRA / Revenu Québec dates (real rules, computed from today; weekends move to Monday)
+- `#/clients`: to do / in progress / ready, tap a client to act
+- `#/money`: what clients owe, reminders, bank matching
+- `#/close`: month-end checklist
+
+Every action shows a toast with Undo.
 
 Run locally: `python -m http.server 5174` then open http://localhost:5174
 

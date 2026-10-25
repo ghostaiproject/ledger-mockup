@@ -2,129 +2,119 @@
 <html lang="fr-CA">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solva · Cabinet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f4d3a">
+<title>Solva</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=optional" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=optional" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="preload" href="assets/icons.js" as="script">
 <link rel="preload" href="app.js" as="script">
-<!-- sections are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
+<!-- screens are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
 <script>document.documentElement.classList.add('booting'); setTimeout(() => document.documentElement.classList.remove('booting'), 3000);</script>
 </head>
 <body>
 <div class="app">
 
-  <aside class="side">
-    <div class="brand"><span class="logo"><i data-lucide="scale"></i></span><b>Solva</b></div>
-    <nav class="nav" aria-label="Sections" data-i18n-label="sections">
-      <a class="active" aria-current="true" href="#top"><i data-lucide="layout-dashboard"></i><span data-i18n="navOverview"></span></a>
-      <a href="#deadlines"><i data-lucide="calendar-clock"></i><span data-i18n="navDeadlines"></span></a>
-      <a href="#clients"><i data-lucide="users"></i><span data-i18n="navClients"></span></a>
-      <a href="#banking"><i data-lucide="landmark"></i><span data-i18n="navBanking"></span></a>
-      <a href="#close"><i data-lucide="list-checks"></i><span data-i18n="navClose"></span></a>
-    </nav>
-    <div class="side-card">
-      <i data-lucide="timer"></i>
-      <p data-i18n="billable"></p>
-      <b class="mono" id="hoursSide">0 h</b>
-      <span class="bar"><span id="hoursBar"></span></span>
+  <header class="bar">
+    <a class="brand" href="#/" data-i18n-label="home"><span class="logo"><i data-lucide="sprout"></i></span><b>Solva</b></a>
+    <div class="settings">
+      <div class="seg" role="radiogroup" data-i18n-label="language">
+        <button role="radio" data-lang="fr" lang="fr-CA">FR</button>
+        <button role="radio" data-lang="en" lang="en-CA">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" data-theme-toggle="1"></button>
     </div>
-  </aside>
+  </header>
+
+  <nav class="nav" data-i18n-label="sections"></nav>
 
   <main class="main">
-    <header class="top" id="top">
-      <div>
-        <p class="eyebrow" id="date"></p>
-        <h1 id="greet"></h1>
-        <p class="sub" data-i18n="tagline"></p>
-      </div>
-      <div class="toggles">
-        <div class="seg" role="radiogroup" data-i18n-label="language">
-          <span class="seg-ind"></span>
-          <button role="radio" data-lang="fr" lang="fr-CA">FR</button>
-          <button role="radio" data-lang="en" lang="en-CA">EN</button>
+    <!-- landing -->
+    <section class="screen landing" data-screen="home">
+      <div class="land-hero">
+        <div class="land-copy">
+          <p class="kicker" data-i18n="kicker"></p>
+          <h1 tabindex="-1" data-i18n="landTitle"></h1>
+          <p class="lead" data-i18n="landLead"></p>
+          <div class="cta">
+            <a class="btn primary big" href="#/today"><span data-i18n="open"></span><i data-lucide="arrow-right"></i></a>
+            <a class="link" href="#how" data-i18n="how"></a>
+          </div>
         </div>
-        <div class="seg" role="radiogroup" data-i18n-label="theme">
-          <span class="seg-ind"></span>
-          <button role="radio" data-theme-set="day"><i data-lucide="sun"></i><span data-i18n="day"></span></button>
-          <button role="radio" data-theme-set="night"><i data-lucide="moon"></i><span data-i18n="night"></span></button>
+        <div class="phone" aria-hidden="true">
+          <div class="phone-screen">
+            <p class="ph-date" id="phDate"></p>
+            <p class="ph-title" data-i18n="todayTitle"></p>
+            <div class="ph-row"><span class="dot red"></span><span data-i18n="phRow1"></span></div>
+            <div class="ph-row"><span class="dot amber"></span><span data-i18n="phRow2"></span></div>
+            <div class="ph-row done"><span class="dot"></span><span data-i18n="phRow3"></span></div>
+            <span class="ph-btn" data-i18n="phBtn"></span>
+          </div>
         </div>
       </div>
-    </header>
+      <ul class="benefits" id="how"></ul>
+      <p class="foot" data-i18n="demo"></p>
+    </section>
 
-    <section class="hero card">
-      <div class="pulse">
+    <!-- app screens: one clear thing each -->
+    <section class="screen" data-screen="today">
+      <p class="kicker" id="date"></p>
+      <h1 tabindex="-1" id="greet"></h1>
+      <div class="card answer">
         <svg viewBox="0 0 120 120" class="ring" aria-hidden="true">
-          <circle cx="60" cy="60" r="50" class="ring-bg"/>
-          <circle cx="60" cy="60" r="50" class="ring-fg" id="pulseRing"/>
+          <circle cx="60" cy="60" r="50" class="ring-bg"/><circle cx="60" cy="60" r="50" class="ring-fg" id="ring"/>
         </svg>
-        <div class="pulse-num"><b class="mono" id="pulseScore">0</b><span data-i18n="pulse"></span><em id="pulseWord"></em></div>
+        <div><b class="huge num" id="todayCount"></b><p id="todayLine"></p></div>
       </div>
-      <div class="pulse-text">
-        <p class="eyebrow" data-i18n="nextBest"></p>
-        <p id="pulseTip"></p>
-      </div>
-      <ul class="hero-stats">
-        <li><i data-lucide="wallet"></i><b class="mono" id="statCash"></b><span data-i18n="statCash"></span></li>
-        <li><i data-lucide="hand-coins"></i><b class="mono" id="statAR"></b><span data-i18n="statAR"></span></li>
-        <li><i data-lucide="triangle-alert"></i><b class="mono" id="statLate"></b><span data-i18n="statLate"></span></li>
-        <li><i data-lucide="calendar-clock"></i><b id="statNext"></b><span data-i18n="statNext"></span></li>
-      </ul>
+      <ul class="tasks" id="tasks"></ul>
     </section>
 
-    <section class="card" id="deadlines">
-      <div class="card-head"><h2 data-i18n="deadlines"></h2><span class="pill" id="dlPill"></span></div>
-      <ul class="dl" id="dlList"></ul>
+    <section class="screen" data-screen="deadlines">
+      <h1 tabindex="-1" data-i18n="deadlines"></h1>
+      <p class="lead" data-i18n="deadlinesLead"></p>
+      <div id="dlNext"></div>
+      <h2 data-i18n="later"></h2>
+      <ul class="list" id="dlList"></ul>
     </section>
 
-    <section class="card clients" id="clients">
-      <div class="card-head">
-        <h2 id="clientsTitle" data-i18n="clients"></h2>
-        <div class="chips" id="clientTabs" role="tablist" aria-labelledby="clientsTitle"></div>
+    <section class="screen" data-screen="clients">
+      <h1 tabindex="-1" id="clientsTitle" data-i18n="clients"></h1>
+      <div class="seg wide" role="radiogroup" id="clientFilter" data-i18n-label="clients"></div>
+      <ul class="list" id="files"></ul>
+    </section>
+
+    <section class="screen" data-screen="money">
+      <h1 tabindex="-1" data-i18n="money"></h1>
+      <div class="card answer">
+        <div><p data-i18n="owed"></p><b class="huge num" id="owed"></b>
+          <div class="split" id="split" role="img"></div>
+          <p class="legend"><span><i class="dot"></i><span id="onTime"></span></span><span><i class="dot red"></i><span id="lateAmt"></span></span></p>
+        </div>
       </div>
-      <div id="clientPanel" role="tabpanel">
-        <ul class="files" id="files"></ul>
+      <h2 data-i18n="chase"></h2>
+      <ul class="list" id="chaseList"></ul>
+      <div class="card bank">
+        <span class="ic"><i data-lucide="landmark"></i></span>
+        <div><b id="bankLine"></b><p class="muted" data-i18n="bankHint"></p></div>
+        <button class="btn primary" id="matchBtn" data-match="1"></button>
       </div>
     </section>
 
-    <section class="card close" id="close">
-      <div class="card-head"><h2 id="closeTitle"></h2><span class="pill" id="closePill"></span></div>
-      <div class="progress" aria-hidden="true"><span id="closeBar"></span></div>
+    <section class="screen" data-screen="close">
+      <h1 tabindex="-1" id="closeTitle"></h1>
+      <p class="lead" data-i18n="closeLead"></p>
+      <div class="card answer">
+        <div class="grow"><b class="huge num" id="closeCount"></b>
+          <span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="closeBar"><span></span></span></div>
+      </div>
       <ul class="checks" id="checks"></ul>
     </section>
   </main>
-
-  <aside class="rail">
-    <section class="card aging">
-      <div class="card-head">
-        <h2 data-i18n="aging"></h2>
-        <div class="seg small" role="radiogroup" data-i18n-label="aging">
-          <span class="seg-ind"></span>
-          <button role="radio" data-book="ar" data-i18n="ar"></button>
-          <button role="radio" data-book="ap" data-i18n="ap"></button>
-        </div>
-      </div>
-      <b class="mono big" id="agingTotal"></b>
-      <div class="stack" id="agingBar" role="img"></div>
-      <ul class="buckets" id="buckets"></ul>
-    </section>
-
-    <section class="card chase">
-      <div class="card-head"><h2 data-i18n="chase"></h2><span class="pill" id="chasePill"></span></div>
-      <ul class="rows" id="chaseList"></ul>
-    </section>
-
-    <section class="card bank" id="banking">
-      <div class="card-head"><h2 data-i18n="recon"></h2><span class="pill" id="reconPill"></span></div>
-      <ul class="rows" id="banks"></ul>
-      <button class="btn wide" data-match="all"><i data-lucide="wand-sparkles"></i><span data-i18n="autoMatch"></span></button>
-    </section>
-  </aside>
 </div>
 
-<div class="toast" id="toast" role="status"></div>
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button class="toast-undo" id="toastUndo" hidden></button></div>
 
 <script src="assets/icons.js"></script>
 <script src="app.js"></script>

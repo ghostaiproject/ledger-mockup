@@ -26,31 +26,30 @@ def sheet(page, shots):
               display: flex; gap: 12px; align-items: flex-start; }}
       figure {{ margin: 0; flex: var(--f); }} img {{ width: 100%; display: block; border-radius: 6px; }}
       figcaption {{ margin-bottom: 6px; }}
-      figure:last-child {{ --f: .45; }} figure {{ --f: 1; }}
+      figure {{ --f: .5; }} figure:nth-child(-n+2) {{ --f: 1.1; }}
     </style>{cells}''')
     page.wait_for_load_state('load')
     page.screenshot(path=OUT / 'sheet.jpg', full_page=True, type='jpeg', quality=60)
 
 
+def shot(b, route, w, h, dark=False, full=False, mobile=False):
+    pg = b.new_page(viewport={'width': w, 'height': h}, device_scale_factor=2 if mobile else 1, is_mobile=mobile, has_touch=mobile)
+    pg.goto(URL + route, wait_until='networkidle')
+    if dark:
+        pg.click('[data-theme-toggle]')
+    pg.wait_for_timeout(600)
+    name = (route.strip('#/') or 'home') + ('-dark' if dark else '') + ('-phone' if mobile else '')
+    return pg.screenshot(path=OUT / f'{name}.png', full_page=full)
+
+
 with sync_playwright() as p:
     b = p.chromium.launch()
-    desk = b.new_page(viewport={'width': 1440, 'height': 960}, device_scale_factor=1)
-    desk.goto(URL, wait_until='networkidle')
-    desk.wait_for_timeout(800)
-    day = desk.screenshot(path=OUT / 'desktop.png', full_page=True)
-    desk.click('[data-lang="en"]')
-    desk.click('[data-theme-set="night"]')
-    desk.click('[data-tab="action"]')
-    desk.evaluate('scrollTo(0, 0)')
-    desk.wait_for_timeout(900)
-    night = desk.screenshot(path=OUT / 'desktop-night.png', full_page=True)
-
-    mob = b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    mob.goto(URL, wait_until='networkidle')
-    mob.wait_for_timeout(800)
-    phone = mob.screenshot(path=OUT / 'mobile.png')
-
-    sheet(b.new_page(), [('Desktop · FR', day), ('Night · EN', night), ('Mobile', phone)])
+    shots = [('Landing', shot(b, '', 1440, 900)),
+             ('Desktop · Today', shot(b, '#/today', 1440, 900)),
+             ('Phone · Today', shot(b, '#/today', 390, 844, mobile=True)),
+             ('Phone · Clients · dark', shot(b, '#/clients', 390, 844, dark=True, mobile=True)),
+             ('Phone · Money', shot(b, '#/money', 390, 844, mobile=True))]
+    sheet(b.new_page(), shots)
     b.close()
 
 for f in sorted(OUT.glob('*.*')):
