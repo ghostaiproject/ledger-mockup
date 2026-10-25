@@ -546,7 +546,7 @@ function match() {
 
 /* ---------- autopilot: the engine works in a background thread, the page only shows its output ---------- */
 let worker = null;
-try { worker = new Worker('engine.js'); } catch (e) { /* file:// or no workers: it runs in the page instead */ }
+try { worker = new Worker($('script[src^="engine.js"]').getAttribute('src')); } catch (e) { /* file:// or no workers: it runs in the page instead */ }
 function engine(input) {
   if (!worker) return Promise.resolve(SolvaEngine.run(input));
   return new Promise((done) => {
