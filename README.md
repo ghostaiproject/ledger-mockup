@@ -1,7 +1,7 @@
 # Solva
 
-Phone-first mock app for a Québec accounting firm (cabinet comptable), made for someone who doesn't love tech:
-one clear thing per screen, big buttons, plain words, dark green. Bilingual FR-CA / EN-CA, light and dark.
+Phone-first mock of an accountant's workbench for a Québec firm (cabinet comptable): Autopilot prepares the books,
+the accountant reviews every decision with its reason, tunes the engine, signs off, and files on time. Dark green. Bilingual FR-CA / EN-CA, light and dark.
 Live: https://ghostaiproject.github.io/ledger-mockup/
 
 Built with the `webd` skill (Ghostskills). Static HTML/CSS/JS, fake data, nothing is filed or sent.
@@ -10,6 +10,15 @@ Screens (one page, hash routes):
 - `#/` landing page: what Solva does, "Open my dashboard"
 - `#/today`: what's left to do today, one button per task
 - `#/auto`: **Autopilot**: drop a bank statement + invoice list (CSV), it does the bookkeeping (see below)
+- `#/review`: **Review**: every bank line with its method (rule, learned, matched invoice, by hand), its reason and a confidence score;
+  override the account, approve in batches, ten tie-outs that show what they compared, preparer + reviewer sign-off (any later change voids it),
+  review log, journal entries, audit trail CSV
+- `#/engine`: **Engine**: every Autopilot setting (GST/QST rates, ITC % per account, filing frequency, terms, aging buckets, matching tolerances,
+  similarity and confidence thresholds, duplicate/outlier flags, vendor rules with a live tester, learned vendors), each change logged and rerun; export/import JSON
+- `#/calendar`: **Calendar**: GST/QST, source deductions, instalments, T2/CO-17, T1/TP-1, T4/RL-1 worked out from each client's profile
+  (type, GST/QST frequency, year end, payroll); filter by client/type, mark filed, add reminders, export .ics, arrow-key date grid
+- **Guided sample** (the "try with sample files" button): the whole job, step by step with the real actions: files in → Autopilot → exceptions
+  cleared → a setting changed → batch review → tie-outs + preparer sign-off → reviewer sign-off → GST/QST filed on the calendar → client summary
 - `#/deadlines`: CRA / Revenu Québec dates (real rules, computed from today; weekends move to Monday)
 - `#/clients`: to do / in progress / ready, tap a client to act
 - `#/money`: what clients owe, reminders, bank matching
@@ -31,7 +40,9 @@ Feed it files, it does the work in a background Web Worker and hands back the ou
 Output: profit and loss, tax return figures, who still owes what (aging), a client summary to copy, and CSV downloads (journal, sorted bank, GST/QST, trial balance).
 The client's file and the month-end checklist update themselves. Try it with the sample files button.
 
-Test: `node tools/engine_test.js`
+Test: `node tools/engine_test.js` (books, parsing, settings, tie-outs)
+
+Files: `engine.js` (books), `app.js` (screens), `desk.js` + `desk.css` (review, engine, calendar), `tour.js` (guided sample)
 
 Run locally: `python -m http.server 5174` then open http://localhost:5174
 

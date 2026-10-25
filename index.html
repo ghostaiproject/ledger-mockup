@@ -9,8 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=optional" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="desk.css">
 <link rel="preload" href="assets/icons.js" as="script">
 <link rel="preload" href="engine.js" as="script">
+<link rel="preload" href="desk.js" as="script">
 <link rel="preload" href="app.js" as="script">
 <!-- screens are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
 <script>document.documentElement.classList.add('booting'); setTimeout(() => document.documentElement.classList.remove('booting'), 3000);</script>
@@ -85,6 +87,24 @@
       <input type="file" id="fileIn" accept=".csv,.tsv,.txt,text/csv" multiple hidden>
     </section>
 
+    <section class="screen" data-screen="review">
+      <h1 tabindex="-1" data-i18n-tp="review.title"></h1>
+      <p class="lead" data-i18n-tp="review.lead"></p>
+      <div id="rvOut"></div>
+    </section>
+
+    <section class="screen" data-screen="calendar">
+      <h1 tabindex="-1" data-i18n-tp="cal.title"></h1>
+      <p class="lead" data-i18n-tp="cal.lead"></p>
+      <div id="calOut"></div>
+    </section>
+
+    <section class="screen" data-screen="engine">
+      <h1 tabindex="-1" data-i18n-tp="eng.title"></h1>
+      <p class="lead" data-i18n-tp="eng.lead"></p>
+      <div id="engOut"></div>
+    </section>
+
     <section class="screen" data-screen="deadlines">
       <h1 tabindex="-1" data-i18n="deadlines"></h1>
       <p class="lead" data-i18n="deadlinesLead"></p>
@@ -132,6 +152,8 @@
 
 <script src="assets/icons.js"></script>
 <script src="engine.js"></script>
+<script src="desk.js"></script>
+<script src="tour.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

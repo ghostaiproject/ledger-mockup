@@ -27,3 +27,16 @@ const us = E.run({ asOf, files: [{ name: 'i.csv', text: 'Invoice #,Customer,Date
   { name: 'b.csv', text: 'Posted,Payee,Amount\n09/03/2026,E-TRANSFER SMITH CO,1149.75\n09/30/2026,SHELL 1234,-80.00' }] });
 assert.deepStrictEqual(us.bank[0].invoices, ['A-1']);
 console.log('OK', r.period, `${r.journal.length} entries`, `review ${types}`, `profit ${r.pnl.profit}`, `taxes ${r.taxes.gstNet}/${r.taxes.qstNet}`, `owed ${r.owed.map((o) => o.no + ':' + o.left + '@' + o.late).join(' ')}`, `aging ${r.aging}`, `${r.ms}ms`);
+// settings: every knob changes the run, and the tie-outs say what they compared
+assert.strictEqual(r.checks.filter((c) => c.ok === false).map((c) => c.id).join(), 'sorted', 'only the unsorted vendor fails: ' + r.checks.filter((c) => c.ok === false).map((c) => c.id));
+assert(r.bank.every((x) => typeof x.conf === 'number' && x.why), 'every line explains itself');
+assert(r.journal.every((e) => e.src), 'every entry points to its source');
+const q = E.run({ files: E.sample(asOf), asOf, settings: { filing: 'quarterly' } });
+assert.strictEqual(q.taxes.due, '2026-11-02', 'quarterly Q3: Oct 31 is a Saturday, so Monday');
+const noOut = E.run({ files: E.sample(asOf), asOf, settings: { outlier: { z: 99 } } });
+assert(!noOut.review.some((x) => x.type === 'outlier'), 'outlier threshold is a setting');
+const bad = E.run({ files: E.sample(asOf), asOf, settings: { rules: [{ re: '(', acct: 5100 }] } });
+assert.strictEqual(bad.checks.find((c) => c.id === 'rules').ok, false, 'a broken rule is reported, not fatal');
+const hst = E.run({ files: E.sample(asOf), asOf, settings: { gst: 0.05, qst: 0 } });
+assert.strictEqual(hst.taxes.qst, 0, 'rates are settings');
+console.log('OK settings + checks', r.checks.map((c) => c.id + ':' + c.ok).join(' '));

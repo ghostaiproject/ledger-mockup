@@ -1,20 +1,20 @@
-// Solva: simple, phone-first mock for a Québec accounting firm. Fake clients and figures; nothing is filed or sent anywhere.
+// Solva: phone-first mock of an accountant's workbench for a Québec firm (desk.js adds review, engine settings and the calendar). Fake clients and figures; nothing is filed or sent anywhere.
 const T = {
   fr: {
     home: 'Accueil Solva', language: 'Langue', sections: 'Sections', dark: 'Mode sombre', light: 'Mode clair',
-    nav: { today: "Aujourd'hui", auto: 'Pilote auto', deadlines: 'Échéances', clients: 'Clients', money: 'Argent', close: 'Fin de mois' },
-    kicker: 'Pour les cabinets comptables du Québec',
-    landTitle: 'Ta journée de comptable, en toute simplicité.',
-    landLead: "Solva te montre quoi faire aujourd'hui : les échéances à respecter, les clients à relancer, la fin de mois à boucler. Rien de plus.",
+    nav: { today: "Aujourd'hui", calendar: 'Calendrier', clients: 'Clients', auto: 'Pilote auto', review: 'Révision', money: 'Argent', close: 'Fin de mois', engine: 'Moteur', deadlines: 'Échéances' },
+    kicker: 'Pour les CPA et les cabinets comptables du Québec',
+    landTitle: 'Moins de saisie. Plus de révision.',
+    landLead: "Solva prépare les livres de tes clients, explique chaque décision et te laisse corriger, approuver et signer. Toutes les échéances ARC et Revenu Québec du portefeuille, dans un seul calendrier.",
     open: 'Voir ma journée', how: 'Comment ça marche',
     benefits: [
-      ['wand-sparkles', 'Le pilote auto fait la tenue de livres', 'Tu donnes le relevé et les factures. Solva classe, relie, calcule les taxes et prépare les fichiers.'],
-      ['calendar-clock', 'Les échéances, sans stress', "ARC et Revenu Québec : Solva te rappelle chaque date, au bon moment."],
-      ['users', "Tes clients, d'un coup d'œil", 'Qui doit envoyer des documents, qui est prêt. En mots simples, pas en tableaux.'],
-      ['list-checks', 'La fin de mois, pas à pas', 'Une liste à cocher. Une étape à la fois.'],
+      ['wand-sparkles', 'Le pilote auto prépare, tu révises', 'Relevé et factures en entrée : classement, rapprochement, TPS/TVQ, écritures. Seules les exceptions te reviennent.'],
+      ['shield-check', 'Chaque décision a sa raison', 'Règle, fournisseur appris, facture reliée : tout est montré, corrigeable, approuvable par lot, puis signé par le préparateur et le réviseur.'],
+      ['sliders-horizontal', 'Le moteur, réglable et vérifiable', 'Taux, CTI par compte, seuils, règles de fournisseurs : tout se change, tout est noté, et dix contrôles se refont à la main.'],
+      ['calendar-days', 'Un calendrier pour tout le portefeuille', 'TPS/TVQ, DAS, acomptes, T2/CO-17, T4/RL-1 : calculés selon le profil de chaque client, exportables vers ton agenda.'],
     ],
     demo: "Maquette de démonstration · données fictives · rien n'est envoyé",
-    phRow1: 'TPS/TVQ · Café Mistral', phRow2: 'Relancer Transports Nordet', phRow3: 'Relier la banque', phBtn: "C'est fait",
+    phRow1: '3 exceptions · Atelier Boréal', phRow2: 'TPS/TVQ · Café Mistral', phRow3: 'Contrôles conformes', phBtn: 'Signer la révision',
     todayTitle: "Aujourd'hui", morning: 'Bonjour', evening: 'Bonsoir',
     leftToday: (n) => (n ? `chose${n > 1 ? 's' : ''} à faire aujourd'hui` : 'Tout est fait pour aujourd\'hui. Bravo !'),
     allDone: 'Profite de ta soirée.',
@@ -31,6 +31,8 @@ const T = {
     pct: (n) => `${n} % fait`, ask: 'Demander les documents', asked: 'Demande envoyée', ready: 'Marquer comme prêt', allReady: 'Dossier prêt. Rien à faire.',
     remind: (c) => `Envoyer un rappel à ${c}`, reminded: 'Rappel envoyé', unpaid: (d) => `impayée depuis ${d} jours`,
     tasks: {
+      review: ['Révision', 'Réviser et signer le dossier', (c) => `${c} · exceptions, contrôles et signatures du préparateur et du réviseur.`, 'Ouvrir la révision'],
+      week: ['Cette semaine', 'Échéances des 7 prochains jours', (n) => `${n} à produire pour tes clients · voir le calendrier`, 'Ouvrir le calendrier'],
       auto: ['Pilote auto', 'Faire les livres du mois', (c) => `${c} · dépose le relevé et les factures, Solva fait le reste.`, 'Ouvrir le pilote auto'],
       payroll: ['Fait', 'Inscrire les paies de la semaine', () => 'Fait ce matin, 7 employés', ''],
       late: ['En retard', 'Produire la TPS/TVQ de Café Mistral', (d) => `Taxes de vente du mois dernier · ${d} jours de retard`, "C'est fait"],
@@ -64,7 +66,7 @@ const T = {
         check: (r) => (!r.balance ? 'Pas de colonne Solde : vérification du solde sautée'
           : r.balance.ok ? `Solde bancaire vérifié : ${cents(r.balance.opening)} → ${cents(r.balance.closing)}` : 'Le solde ne suit pas : une ligne manque peut-être'),
       },
-      tag: { duplicate: 'Deux fois ?', outlier: 'Montant inhabituel', deposit: 'Dépôt', partial: 'Paiement partiel', gap: 'Ligne manquante', unknown: 'Nouveau fournisseur' },
+      tag: { lowconf: 'Pas sûr', duplicate: 'Deux fois ?', outlier: 'Montant inhabituel', deposit: 'Dépôt', partial: 'Paiement partiel', gap: 'Ligne manquante', unknown: 'Nouveau fournisseur' },
       rv: {
         duplicate: [(x) => `Même montant, même fournisseur, déjà payé le ${day(x.twin)}. Facturé deux fois ?`, [['Oui, deux fois', { account: 1250 }], ['Non, les deux sont bons', { ok: true }]]],
         outlier: [(x) => `${x.times} fois plus que d'habitude pour ce compte. Un achat d'équipement ?`, [["C'est de l'équipement", { account: 1500 }], ['Le montant est bon', { ok: true }]]],
@@ -72,6 +74,7 @@ const T = {
         partial: [(x) => `Paiement partiel de la facture ${x.inv} (${cents(x.total)}). Il reste ${cents(x.left)} à recevoir.`, [['Compris', { ok: true }]]],
         gap: [(x) => `Le solde saute de ${cents(x.amount)} entre le ${day(x.after)} et le ${day(x.before)} : une ligne manque peut-être au relevé.`, [['Compris', { ok: true }]]],
         unknown: [() => 'Je ne connais pas ce fournisseur. Choisis le compte, je vais m’en souvenir.', []],
+        lowconf: [(x) => `Classé dans ${x.tx.account} · ${acctName(x.tx.account)} avec ${Math.round(x.tx.conf * 100)} % de confiance. Vérifie une fois.`, [['C’est le bon compte', { ok: true }]]],
       },
       account: 'Compte', save: 'Enregistrer',
       pnl: { revenue: 'Revenus', spent: 'Dépenses' },
@@ -88,19 +91,19 @@ const T = {
   },
   en: {
     home: 'Solva home', language: 'Language', sections: 'Sections', dark: 'Dark mode', light: 'Light mode',
-    nav: { today: 'Today', auto: 'Autopilot', deadlines: 'Deadlines', clients: 'Clients', money: 'Money', close: 'Month-end' },
-    kicker: 'For Québec accounting firms',
-    landTitle: 'Your accounting day, made simple.',
-    landLead: 'Solva tells you what to do today: deadlines to meet, clients to follow up, the month to close. Nothing more.',
+    nav: { today: 'Today', calendar: 'Calendar', clients: 'Clients', auto: 'Autopilot', review: 'Review', money: 'Money', close: 'Month-end', engine: 'Engine', deadlines: 'Deadlines' },
+    kicker: 'For Québec CPAs and accounting firms',
+    landTitle: 'Less data entry. More review.',
+    landLead: 'Solva prepares your clients’ books, explains every decision and lets you fix, approve and sign off. Every CRA and Revenu Québec date for the whole client list, in one calendar.',
     open: 'See my day', how: 'How it works',
     benefits: [
-      ['wand-sparkles', 'Autopilot does the bookkeeping', 'Give it the bank statement and the invoices. Solva sorts, matches, works out the taxes and makes the files.'],
-      ['calendar-clock', 'Deadlines, without the stress', 'CRA and Revenu Québec: Solva reminds you of every date, right on time.'],
-      ['users', 'Your clients at a glance', 'Who owes you documents, who is ready. In plain words, not spreadsheets.'],
-      ['list-checks', 'Month-end, step by step', 'One checklist. One step at a time.'],
+      ['wand-sparkles', 'Autopilot prepares, you review', 'Statement and invoices in: sorting, matching, GST/QST, journal entries. Only the exceptions come back to you.'],
+      ['shield-check', 'Every decision shows its reason', 'Rule, learned vendor, matched invoice: all shown, fixable, approvable in batches, then signed by preparer and reviewer.'],
+      ['sliders-horizontal', 'An engine you can set and check', 'Rates, ITC by account, thresholds, vendor rules: everything can change, everything is logged, and ten tie-outs can be redone by hand.'],
+      ['calendar-days', 'One calendar for the whole client list', 'GST/QST, source deductions, instalments, T2/CO-17, T4/RL-1: worked out from each client profile, exportable to your calendar.'],
     ],
     demo: 'Demo mockup · fake data · nothing is sent',
-    phRow1: 'GST/QST · Café Mistral', phRow2: 'Follow up Transports Nordet', phRow3: 'Match the bank', phBtn: 'Done',
+    phRow1: '3 exceptions · Atelier Boréal', phRow2: 'GST/QST · Café Mistral', phRow3: 'Tie-outs pass', phBtn: 'Sign as reviewer',
     todayTitle: 'Today', morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening',
     leftToday: (n) => (n ? `thing${n > 1 ? 's' : ''} to do today` : 'All done for today. Well done!'),
     allDone: 'Enjoy your evening.',
@@ -117,6 +120,8 @@ const T = {
     pct: (n) => `${n}% done`, ask: 'Ask for documents', asked: 'Request sent', ready: 'Mark as ready', allReady: 'File ready. Nothing to do.',
     remind: (c) => `Send a reminder to ${c}`, reminded: 'Reminder sent', unpaid: (d) => `unpaid for ${d} days`,
     tasks: {
+      review: ['Review', 'Review and sign off the file', (c) => `${c} · exceptions, tie-outs, preparer and reviewer sign-off.`, 'Open the review'],
+      week: ['This week', 'Deadlines in the next 7 days', (n) => `${n} to file for your clients · see the calendar`, 'Open the calendar'],
       auto: ['Autopilot', "Do this month's books", (c) => `${c} · drop the statement and invoices, Solva does the rest.`, 'Open Autopilot'],
       payroll: ['Done', "Record this week's payroll", () => 'Done this morning, 7 employees', ''],
       late: ['Late', 'File the GST/QST for Café Mistral', (d) => `Last month's sales tax · ${d} days late`, 'Mark as filed'],
@@ -150,7 +155,7 @@ const T = {
         check: (r) => (!r.balance ? 'No Balance column: balance check skipped'
           : r.balance.ok ? `Bank balance checks out: ${cents(r.balance.opening)} → ${cents(r.balance.closing)}` : 'The balance does not add up: a line may be missing'),
       },
-      tag: { duplicate: 'Twice?', outlier: 'Unusual amount', deposit: 'Deposit', partial: 'Part payment', gap: 'Missing line', unknown: 'New vendor' },
+      tag: { lowconf: 'Not sure', duplicate: 'Twice?', outlier: 'Unusual amount', deposit: 'Deposit', partial: 'Part payment', gap: 'Missing line', unknown: 'New vendor' },
       rv: {
         duplicate: [(x) => `Same amount, same vendor, already paid on ${day(x.twin)}. Charged twice?`, [['Yes, twice', { account: 1250 }], ['No, both are real', { ok: true }]]],
         outlier: [(x) => `${x.times} times the usual for this account. An equipment purchase?`, [["It's equipment", { account: 1500 }], ['The amount is right', { ok: true }]]],
@@ -158,6 +163,7 @@ const T = {
         partial: [(x) => `Part payment of invoice ${x.inv} (${cents(x.total)}). ${cents(x.left)} still to collect.`, [['Got it', { ok: true }]]],
         gap: [(x) => `The balance jumps by ${cents(x.amount)} between ${day(x.after)} and ${day(x.before)}: a line may be missing from the statement.`, [['Got it', { ok: true }]]],
         unknown: [() => "I don't know this vendor. Pick the account and I'll remember it.", []],
+        lowconf: [(x) => `Sorted to ${x.tx.account} · ${acctName(x.tx.account)} at ${Math.round(x.tx.conf * 100)}% confidence. Check it once.`, [['Right account', { ok: true }]]],
       },
       account: 'Account', save: 'Save',
       pnl: { revenue: 'Revenue', spent: 'Expenses' },
@@ -175,13 +181,13 @@ const T = {
 };
 
 const CLIENTS = [
-  { id: 'mistral', name: 'Café Mistral', close: 35, status: 'action', note: { fr: 'Il manque 3 reçus de septembre', en: '3 September receipts missing' } },
-  { id: 'nordet', name: 'Transports Nordet', close: 20, status: 'action', note: { fr: 'Relevé bancaire à recevoir', en: 'Bank statement to receive' } },
-  { id: 'boreal', name: 'Atelier Boréal', close: 80, status: 'progress', note: { fr: 'Presque fini', en: 'Almost done' } },
-  { id: 'pins', name: 'Érablière Deux-Pins', close: 60, status: 'progress', note: { fr: 'Inventaire de sirop à confirmer', en: 'Syrup inventory to confirm' } },
-  { id: 'verveine', name: 'Ferme Verveine', close: 55, status: 'progress', note: { fr: 'Subvention à inscrire', en: 'Grant to record' } },
-  { id: 'lumen', name: 'Clinique Lumen', close: 100, status: 'done', note: { fr: 'États financiers envoyés', en: 'Financial statements sent' } },
-  { id: 'cobalt', name: 'Studio Cobalt', close: 100, status: 'done', note: { fr: 'Déclaration prête à signer', en: 'Tax return ready to sign' } },
+  { id: 'mistral', short: 'Mistral', profile: { type: 'corp', gst: 'monthly', fye: 12, payroll: true, inst: 'monthly' }, team: 'JT · MB', name: 'Café Mistral', close: 35, status: 'action', note: { fr: 'Il manque 3 reçus de septembre', en: '3 September receipts missing' } },
+  { id: 'nordet', short: 'Nordet', profile: { type: 'corp', gst: 'quarterly', fye: 3, payroll: true, inst: 'quarterly' }, team: 'AL · MB', name: 'Transports Nordet', close: 20, status: 'action', note: { fr: 'Relevé bancaire à recevoir', en: 'Bank statement to receive' } },
+  { id: 'boreal', short: 'Boréal', profile: { type: 'corp', gst: 'monthly', fye: 12, payroll: true, inst: 'quarterly' }, team: 'JT · MB', name: 'Atelier Boréal', close: 80, status: 'progress', note: { fr: 'Presque fini', en: 'Almost done' } },
+  { id: 'pins', short: 'Deux-Pins', profile: { type: 'corp', gst: 'annual', fye: 6, payroll: false, inst: 'quarterly' }, team: 'AL · SG', name: 'Érablière Deux-Pins', close: 60, status: 'progress', note: { fr: 'Inventaire de sirop à confirmer', en: 'Syrup inventory to confirm' } },
+  { id: 'verveine', short: 'Verveine', profile: { type: 'sole', gst: 'quarterly', fye: 12, payroll: true }, team: 'JT · SG', name: 'Ferme Verveine', close: 55, status: 'progress', note: { fr: 'Subvention à inscrire', en: 'Grant to record' } },
+  { id: 'lumen', short: 'Lumen', profile: { type: 'corp', gst: 'monthly', fye: 9, payroll: true, inst: 'monthly' }, team: 'AL · MB', name: 'Clinique Lumen', close: 100, status: 'done', note: { fr: 'États financiers envoyés', en: 'Financial statements sent' } },
+  { id: 'cobalt', short: 'Cobalt', profile: { type: 'sole', gst: 'annual', fye: 12, payroll: false }, team: 'JT · SG', name: 'Studio Cobalt', close: 100, status: 'done', note: { fr: 'Déclaration prête à signer', en: 'Tax return ready to sign' } },
 ];
 
 const state = {
@@ -234,7 +240,7 @@ function icons() { // swap <i data-lucide> for inline SVG from assets/icons.js: 
   });
 }
 // controls are rebuilt on every render; these data-* keys find the same control again so focus never drops to <body>
-const FOCUS_KEYS = ['lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task', 'client', 'dl', 'copy', 'pick', 'sample'];
+const FOCUS_KEYS = ['lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task', 'client', 'dl', 'copy', 'pick', 'sample', 'rvRole', 'rvFilter', 'rvAll', 'rvMark', 'rvSel', 'rvAcct', 'rvSign', 'rvUnsign', 'rvWho', 'rvExplain', 'set', 'ruleRe', 'ruleAcct', 'ruleDel', 'mem', 'calNav', 'calKind', 'calDay', 'calDone', 'calClient', 'tour'];
 function focusedKey() {
   const el = document.activeElement;
   const k = el && el.dataset && FOCUS_KEYS.find((key) => key in el.dataset);
@@ -275,6 +281,8 @@ const DEADLINES = [
     due: monthEnd(TODAY.getFullYear(), TODAY.getMonth() + 2) },
   { id: 't4', fr: ["Relevés de fin d'année", 'T4 et RL-1 · 6 clients'], en: ['Year-end slips', 'T4 and RL-1 · 6 clients'], due: nextFeb28() },
 ].map((d) => ({ ...d, due: businessDay(d.due) })).sort((a, b) => a.due - b.due);
+Object.assign(state, deskInit()); // desk.js: settings, review, calendar
+deskSeed();
 const daysTo = (d) => Math.round((d - TODAY) / DAY);
 const whenText = (days) => (days < 0 ? t().late(-days) : days === 0 ? t().today : t().inDays(days));
 
@@ -283,6 +291,8 @@ const unmatched = () => state.bank.total - state.bank.matched;
 const checkOn = (c) => (c.auto ? unmatched() === 0 : c.on);
 const closeDone = () => state.checks.filter(checkOn).length;
 const TASKS = [
+  { id: 'review', done: () => !!state.rv.sign.rev, arg: () => CLIENTS.find((c) => c.id === state.auto.client).name, tone: 'amber' },
+  { id: 'week', done: () => upcoming(7).every((e) => state.filed.has(e.id)), arg: () => upcoming(7).filter((e) => !state.filed.has(e.id)).length, tone: '' },
   { id: 'auto', done: () => !!state.auto.result?.ok && !state.auto.result.review.length, arg: () => CLIENTS.find((c) => c.id === state.auto.client).name, tone: '' },
   { id: 'payroll', done: () => true, arg: () => '', tone: '' }, // already done this morning, so the ring never starts empty
   { id: 'late', done: () => state.filed.has('late'), arg: () => -daysTo(DEADLINES.find((d) => d.id === 'late').due), tone: 'red' },
@@ -297,6 +307,7 @@ function renderShell() {
   document.documentElement.classList.toggle('is-home', state.route === 'home');
   document.title = state.route === 'home' ? 'Solva' : `${t().nav[state.route]} · Solva`;
   document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t()[el.dataset.i18n]; });
+  document.querySelectorAll('[data-i18n-tp]').forEach((el) => { el.textContent = getP(tp(), el.dataset.i18nTp); });
   document.querySelectorAll('[data-i18n-label]').forEach((el) => el.setAttribute('aria-label', t()[el.dataset.i18nLabel]));
   document.querySelectorAll('.seg [data-lang]').forEach((b) => {
     const on = b.dataset.lang === state.lang;
@@ -306,8 +317,8 @@ function renderShell() {
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
-  const NAV = { today: 'sun', auto: 'wand-sparkles', deadlines: 'calendar-clock', clients: 'users', money: 'wallet', close: 'list-checks' };
-  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `<a href="#/${id}" ${id === 'deadlines' ? 'class="wide-only"' : ''} ${state.route === id ? 'aria-current="page"' : ''}>
+  const NAV = { today: 'sun', calendar: 'calendar-days', clients: 'users', auto: 'wand-sparkles', review: 'shield-check', money: 'wallet', close: 'list-checks', engine: 'sliders-horizontal' };
+  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `<a href="#/${id}" ${['money', 'close', 'engine'].includes(id) ? 'class="wide-only"' : ''} ${state.route === id || (id === 'calendar' && state.route === 'deadlines') ? 'aria-current="page"' : ''}>
     <i data-lucide="${ic}"></i><span>${t().nav[id]}</span></a>`).join('');
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.dataset.screen === state.route));
 }
@@ -332,7 +343,7 @@ function renderToday() {
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
       <button class="btn ${done ? '' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
-        <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
+        <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : x.id === 'review' ? 'shield-check' : x.id === 'week' ? 'calendar-days' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }
 
@@ -370,9 +381,16 @@ function renderClients() {
         <span class="avatar" aria-hidden="true">${c.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}</span>
         <div><b>${c.name}</b><small>${c.note[state.lang]}</small></div><i data-lucide="chevron-down"></i></button>
       <div class="file-body" id="f-${c.id}" ${open ? '' : 'hidden'}>
+        ${profileHtml(c)}
         <div class="meter"><span class="progress" role="progressbar" aria-valuenow="${c.close}" aria-valuemin="0" aria-valuemax="100" aria-label="${c.name}">
           <span style="width:${c.close}%"></span></span><span class="num">${t().pct(c.close)}</span></div>${action}</div></li>`;
   }).join('');
+}
+
+function profileHtml(c) {
+  const P = tp().prof, n = nextDue(c), fye = new Date(2026, c.profile.fye - 1, 1).toLocaleDateString(loc(), { month: 'long' });
+  return `<ul class="kv prof">${kv(P.freq, tp().eng.freq[c.profile.gst])}${kv(P.fye, fye)}${n ? kv(P.next, `${day(isoOf(n.date))} · ${esc(n.text)}`) : ''}${kv(P.team, c.team)}</ul>
+    <button class="link" data-cal-go="${c.id}"><i data-lucide="calendar-days"></i>${tp().cal.open}</button>`;
 }
 
 function renderMoney() {
@@ -451,6 +469,7 @@ function renderAuto() {
       <li class="card"><small>${A.taxes(tx.net)}</small><b class="num">${money(Math.abs(tx.net))}</b><small>${A.by(day(tx.due))}</small></li>
       <li class="card"><small>${A.matched}</small><b class="num">${r.matched.deps} / ${r.matched.of}</b></li>
     </ul>
+    <a class="btn soft block to-review" href="#/review"><i data-lucide="shield-check"></i>${tp().review.title} · ${tp().review.lead}</a>
     ${n ? `<h2>${A.checkH}</h2><ul class="reviews">${r.review.map(reviewCard).join('')}</ul>` : ''}
     ${more('did', A.didH, `<ul class="did">${STEPS.map((s) => `<li><i data-lucide="circle-check"></i><span>${A.log[s](r)}</span></li>`).join('')}</ul>`)}
     ${more('pnl', `${A.pnlH}<span class="num">${money(r.pnl.profit)}</span>`, `<ul class="kv">${kv(A.pnl.revenue, cents(r.pnl.revenue))}
@@ -467,7 +486,7 @@ function renderAuto() {
 
 function render() {
   const focus = focusedKey();
-  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto();
+  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderTour();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
 }
@@ -521,7 +540,7 @@ function engine(input) {
 }
 const isoToday = () => [TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate()].map((x) => String(x).padStart(2, '0')).join('-');
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const input = () => ({ files: state.auto.files, memory: state.auto.memory, decisions: state.auto.decisions, asOf: isoToday() });
+const input = () => ({ files: state.auto.files, memory: state.auto.memory, decisions: state.auto.decisions, asOf: isoToday(), settings: state.settings });
 function applyResult() { // the client file and the month-end list follow what Autopilot did
   const a = state.auto, r = a.result, c = CLIENTS.find((x) => x.id === a.client);
   if (!r || !r.ok) return;
@@ -570,6 +589,7 @@ function resetAuto() {
   const a = state.auto, b = a.before;
   if (b) { Object.assign(CLIENTS.find((x) => x.id === b.id), { status: b.status, close: b.close, note: b.note }); b.checks.forEach((on, i) => { state.checks[i].on = on; }); }
   Object.assign(a, { files: [], result: null, decisions: {}, before: null, step: -1 });
+  state.rv = freshReview(state.rv.who);
 }
 document.addEventListener('change', (e) => {
   if (e.target.id === 'fileIn') { addFiles(e.target.files); e.target.value = ''; }
@@ -604,12 +624,14 @@ document.addEventListener('click', (e) => {
   else if (ds.task) {
     if (b.getAttribute('aria-disabled') === 'true') return;
     if (ds.task === 'auto') { location.hash = '#/auto'; return; }
+    if (ds.task === 'review') { location.hash = '#/review'; return; }
+    if (ds.task === 'week') { location.hash = '#/calendar'; return; }
     if (ds.task === 'late') fileDeadline('late');
     else if (ds.task === 'remind') sendReminder(state.chase[0]);
     else match();
   }
   else if (ds.pick) { $('#fileIn').click(); return; }
-  else if (ds.sample) { state.auto.files = SolvaEngine.sample(isoToday()); autopilot(); return; }
+  else if (ds.sample) { tourStart(); return; }
   else if (ds.decide) { decide(ds.decide, ds.opt); return; }
   else if (ds.dl) { download(ds.dl); return; }
   else if (ds.copy) { navigator.clipboard.writeText($('#sumText').textContent).then(() => toast(t().auto.toastCopied), () => toast(t().auto.toastNoCopy)); return; }
@@ -653,7 +675,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------- router: #/today, #/clients… ; plain #anchors stay on the page ---------- */
-const ROUTES = ['home', 'today', 'auto', 'deadlines', 'clients', 'money', 'close'];
+const ROUTES = ['home', 'today', 'auto', 'review', 'calendar', 'engine', 'deadlines', 'clients', 'money', 'close'];
 function route(first) {
   const h = location.hash;
   if (h && !h.startsWith('#/')) return;
