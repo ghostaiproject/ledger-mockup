@@ -39,6 +39,7 @@ const Store = (() => {
     } catch (e) { /* defaults are fine */ }
   }
   async function bootNative() {
+    await StoreNative.open();
     (await StoreNative.load()).forEach((r) => { recs.set(`${r.col}/${r.id}`, r); last = Math.max(last, r.at); });
   }
   function saved(r) { if (StoreNative) StoreNative.save(r); else if (kept(r)) persist(); }

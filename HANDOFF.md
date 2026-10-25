@@ -1,6 +1,12 @@
 # Solva (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Tauri app: Next 1 scaffold)
+## LATEST (2026-10-25, Tauri app: step 4 vault keys)
+- Vault: random DEK wrapped twice: Windows Hello (`hello_win.rs`, sign → HKDF) in `vault.local.json` + Argon2id passphrase in `vault.json` (goes to the cloud in step 5). Dev key file gone (adopted as DEK on create). Release builds now open too.
+- Tauri: `vault_status` {state new|locked|open, device, deviceReady, minPass}, `vault_create(pass)`, `vault_unlock(pass?)` (none = Hello), `vault_lock`. JS: `StoreNative.vault.*`, `Store.ready()` waits for open.
+- Until the screens: `store-native.js` `interimUnlock()` uses Hello, else `prompt()` (create asks twice). Replace with lock/onboarding screens (Next 2, /crew) + idle auto-lock.
+- `tools/app_check.mjs` runs with `SOLVA_DEVICE=file` (debug-only test device key, no prompt): 11 checks (create, short pass, restart, wrong pass, re-wrap, lock). Real Hello prompt NOT yet tried by hand.
+
+## Before (2026-10-25, Tauri app: Next 1 scaffold)
 - Plan: `docs/APP-PLAN.md` (layout, Store API, keys/unlock, disk format, sync, CI, order of work). Decided: Google Drive first, unsigned builds for now, Windows tools local / Android in CI.
 - Scaffold: `package.json` (@tauri-apps/cli), `tools/build_web.mjs` (web files → `dist/`, stamps ?v=), `src-tauri/` (conf, Cargo, lib.rs with `app_info`, capabilities, icons from `app-icon.png` placeholder). Pages workflow untouched.
 - Toolchain on this PC: rustup stable (MSVC) + VS 2022 C++ Build Tools. Cargo is in `%USERPROFILE%\.cargo\bin` (new shells only).

@@ -1,20 +1,32 @@
-// Solva native shell: encrypted records + documents (docs/APP-PLAN.md). Vault and sync come in steps 4-5.
+// Solva native shell: vault (DEK wrapped by device key + passphrase), encrypted records + documents (docs/APP-PLAN.md).
 mod crypt;
+mod device;
 mod disk;
+#[cfg(windows)]
+mod hello_win;
 mod vault;
 
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tauri::ipc::{InvokeBody, Request, Response};
 use tauri::{Manager, State};
 
-struct App(Mutex<Option<disk::Disk>>, Mutex<String>); // open vault, or why it is locked
+struct App {
+    disk: Mutex<Option<disk::Disk>>, // Some = unlocked; dropping it zeroizes the DEK
+    dir: PathBuf,
+}
 
 fn with<T>(app: &State<App>, f: impl FnOnce(&disk::Disk) -> Result<T, String>) -> Result<T, String> {
-    let g = app.0.lock().map_err(|_| "busy".to_string())?;
-    match g.as_ref() {
-        Some(d) => f(d),
-        None => Err(app.1.lock().map(|s| s.clone()).unwrap_or_default()),
-    }
+    let g = app.disk.lock().map_err(|_| "busy".to_string())?;
+    g.as_ref().map_or(Err("locked".into()), f)
+}
+
+/// Argon2id and Windows Hello block: run them off the UI thread, then open the vault with the key they give.
+async fn open_with(app: State<'_, App>, f: impl FnOnce(&Path) -> Result<crypt::Key, String> + Send + 'static) -> Result<(), String> {
+    let dir = app.dir.clone();
+    let key = tauri::async_runtime::spawn_blocking(move || f(&dir)).await.map_err(|e| e.to_string())??;
+    *app.disk.lock().map_err(|_| "busy".to_string())? = Some(disk::Disk::new(app.dir.clone(), key));
+    Ok(())
 }
 
 #[tauri::command]
@@ -22,10 +34,35 @@ fn app_info() -> serde_json::Value {
     serde_json::json!({ "version": env!("CARGO_PKG_VERSION"), "os": std::env::consts::OS, "dev": cfg!(debug_assertions) })
 }
 
+/// state: "new" | "locked" | "open"; device: "hello" | "file" | null (what this PC offers); deviceReady: the vault opens with it.
 #[tauri::command]
 fn vault_status(app: State<App>) -> serde_json::Value {
-    let open = app.0.lock().map(|g| g.is_some()).unwrap_or(false);
-    serde_json::json!({ "open": open, "why": app.1.lock().map(|s| s.clone()).unwrap_or_default() })
+    let open = app.disk.lock().map(|g| g.is_some()).unwrap_or(false);
+    let (state, ready) = vault::status(&app.dir);
+    let state = if open { "open" } else { state };
+    serde_json::json!({ "state": state, "device": device::kind(&app.dir), "deviceReady": ready, "minPass": vault::MIN_PASS })
+}
+
+#[tauri::command]
+async fn vault_create(app: State<'_, App>, pass: String) -> Result<(), String> {
+    let pass = zeroize::Zeroizing::new(pass);
+    open_with(app, move |d| vault::create(d, &pass, vault::COST)).await
+}
+
+/// No passphrase = device key (fingerprint, face or PIN).
+#[tauri::command]
+async fn vault_unlock(app: State<'_, App>, pass: Option<String>) -> Result<(), String> {
+    match pass.map(zeroize::Zeroizing::new) {
+        Some(p) => open_with(app, move |d| vault::open_pass(d, &p)).await,
+        None => open_with(app, vault::open_device).await,
+    }
+}
+
+#[tauri::command]
+fn vault_lock(app: State<App>) {
+    if let Ok(mut g) = app.disk.lock() {
+        *g = None;
+    }
 }
 
 #[tauri::command]
@@ -72,14 +109,10 @@ pub fn run() {
                 Some(d) => std::path::PathBuf::from(d),
                 None => app.path().app_data_dir()?,
             };
-            let (disk, why) = match vault::open_key(&dir) {
-                Ok(key) => (Some(disk::Disk::new(dir, key)), String::new()),
-                Err(e) => (None, e),
-            };
-            app.manage(App(Mutex::new(disk), Mutex::new(why)));
+            app.manage(App { disk: Mutex::new(None), dir });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![app_info, vault_status, rec_all, rec_put, doc_add, doc_open, doc_list, doc_del])
+        .invoke_handler(tauri::generate_handler![app_info, vault_status, vault_create, vault_unlock, vault_lock, rec_all, rec_put, doc_add, doc_open, doc_list, doc_del])
         .run(tauri::generate_context!())
         .expect("error while running Solva");
 }

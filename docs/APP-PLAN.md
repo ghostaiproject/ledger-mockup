@@ -84,6 +84,12 @@ no readable data on disk; uses a throwaway `SOLVA_DATA_DIR`).
 
 ## 4. Keys and unlock (Next 3)
 
+Done (step 4 keys): `vault.rs` (DEK, Argon2id m=64 MB t=3 p=1 → `vault.json`; HKDF device wrap → `vault.local.json`;
+step 3 dev key adopted as the DEK in debug), `device.rs` (hello | file test key | none), `hello_win.rs`
+(KeyCredentialManager sign → secret, raises the Hello dialog). Commands `vault_status/create/unlock/lock`;
+`StoreNative.vault.*`; the store loads only once the vault is open. Passphrase min 10 chars. Interim JS prompts stand in
+for the lock/onboarding screens. Passphrase unlock on a device with no wrap re-wraps for it (cancel = still unlocks).
+
 - **DEK**: one random 256-bit data key per vault. Every record and document = AES-256-GCM,
   random 96-bit nonce, AAD = `col/id/rev`. Lives only in Rust memory (zeroized on lock).
 - **Device wrap**: the DEK is stored only wrapped by a device key:
