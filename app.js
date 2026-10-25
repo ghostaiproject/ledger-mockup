@@ -224,7 +224,6 @@ try { // per-viewer conveniences only
   const saved = JSON.parse(localStorage.getItem('solva-v3') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
-  state.auto.memory = JSON.parse(localStorage.getItem('solva-memory') || '{}'); // vendors you taught Autopilot
 } catch (e) { /* storage blocked: defaults are fine */ }
 function save() { try { localStorage.setItem('solva-v3', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
@@ -513,6 +512,7 @@ function render() {
   renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderFirm(); renderTour();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
+  Bind.flush(); // save what changed
 }
 
 /* ---------- toast with undo ---------- */
@@ -600,7 +600,7 @@ async function decide(id, opt) {
   toast(x.type === 'unknown' ? t().auto.toastLearned(`${x.tx.key} → ${acctName(d.account)}`) : t().auto.toastSaved,
     () => { a.decisions = prev.decisions; a.memory = prev.memory; saveMemory(); rerun(); });
 }
-function saveMemory() { try { localStorage.setItem('solva-memory', JSON.stringify(state.auto.memory)); } catch (e) { /* ignore */ } }
+function saveMemory() { Bind.flush(); } // vendors you taught Autopilot: saved through the store
 function download(kind) {
   const r = state.auto.result, file = SolvaEngine.exportsFor(r, state.lang)[kind];
   const link = document.createElement('a');
@@ -711,5 +711,4 @@ function route(first) {
   if (!first) { window.scrollTo(0, 0); $(`[data-screen="${state.route}"] h1`).focus({ preventScroll: true }); }
 }
 window.addEventListener('hashchange', () => route(false));
-route(true);
-document.documentElement.classList.remove('booting');
+Store.ready().then(Bind.load).then(() => { route(true); document.documentElement.classList.remove('booting'); });

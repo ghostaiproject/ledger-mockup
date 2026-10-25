@@ -168,20 +168,13 @@ const E_ = () => SolvaEngine;
 /* ---------- state (app.js merges this in) ---------- */
 function deskInit() {
   const d = { settings: {}, setLog: [], rv: freshReview(), cal: { y: TODAY.getFullYear(), m: TODAY.getMonth(), sel: isoOf(TODAY), client: 'all', off: [], mine: [] } };
-  try {
-    const s = JSON.parse(localStorage.getItem('solva-desk') || '{}');
-    if (s.settings) d.settings = s.settings;
-    if (Array.isArray(s.setLog)) d.setLog = s.setLog;
-    if (Array.isArray(s.mine)) d.cal.mine = s.mine;
-    if (s.who) d.rv.who = s.who;
-  } catch (e) { /* storage blocked: defaults */ }
   return d;
 }
 function deskSeed() { // a firm's real calendar: what was due before today is already filed, except Café Mistral's late return
   for (let i = -3; i <= 0; i++) monthEvents(TODAY.getFullYear(), TODAY.getMonth() + i).forEach((e) => { if (e.date < TODAY && e.client && e.client.id !== 'mistral') state.filed.add(e.id); });
 }
 function freshReview(who) { return { filter: 'flags', sel: [], marks: {}, explained: {}, sign: { prep: null, rev: null }, role: 'prep', who: who || { prep: 'JT', rev: 'MB' }, log: [] }; }
-function deskSave() { try { localStorage.setItem('solva-desk', JSON.stringify({ settings: state.settings, setLog: state.setLog.slice(-200), mine: state.cal.mine, who: state.rv.who })); } catch (e) { /* ignore */ } }
+function deskSave() { Bind.flush(); } // settings, log, reminders, initials: saved through the store (store-bind.js)
 const isoOf = (d) => [d.getFullYear(), d.getMonth() + 1, d.getDate()].map((x) => String(x).padStart(2, '0')).join('-');
 const stamp = () => new Date().toLocaleString(loc(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const me = () => state.rv.who[state.rv.role] || '—';
