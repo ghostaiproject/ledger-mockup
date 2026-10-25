@@ -1,0 +1,3 @@
+[default]
+description = "Folio keystore"
+permissions = ["allow-supported", "allow-secret", "allow-create"]

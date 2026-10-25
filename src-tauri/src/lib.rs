@@ -101,7 +101,10 @@ fn doc_del(app: State<App>, id: String) -> Result<(), String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_keystore::init());
+    builder
         .setup(|app| {
             // debug builds can run on a throwaway folder (tools/app_check.mjs); release always uses the app data dir
             let test_dir = std::env::var_os("FOLIO_DATA_DIR").filter(|_| cfg!(debug_assertions));

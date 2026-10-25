@@ -1,6 +1,12 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
+## LATEST (2026-10-25, Android keystore plugin + CI)
+- `src-tauri/plugins/keystore/` (Rust + Kotlin): Keystore HMAC-SHA256 key, per-use auth via BiometricPrompt + CryptoObject (fingerprint/face/PIN, minSdk 30). Same `secret(name, challenge)` contract as Hello; `device.rs` kind = "keystore" on Android. Registered in lib.rs under `cfg(target_os = "android")`.
+- UI: on keystore the "Windows Hello" strings become "phone lock" (`dev()` in vault-ui.js); locks after 30 s in the background (`bg` reason).
+- CI: `.github/workflows/app.yml` = Windows (tests + unsigned msi/nsis) + Android (`tauri android init` + debug apk) artifacts. Kotlin/Android NOT compiled locally: first CI run is the real test; fix from its log. Not tried on a phone.
+- `npm run check`: ALL OK (desktop unchanged).
+
+## Before (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
 - Rename: Solva → Folio everywhere (exe `folio.exe`, id `ca.folio.app`, env `FOLIO_DATA_DIR` / `FOLIO_DEVICE`). Storage keys kept (`solva-v3`, `solva-store-web`, `solva-idle-min`, `solva-lock`, HMAC label `solva-name`) so nothing needs migrating.
 - Screens: `vault-ui.js` + `vault-ui.css` + `vault-i18n.js` (FR/EN), app only (null on the web demo). First run = create (passphrase twice, min 10, strength meter, "keep it safe" warning, Hello note) → "Par où commencer?" (Cabinet vide / Charger l'exemple). Locked = Windows Hello button first (opens by itself at start, not after a lock) + "Utiliser ma phrase secrète"; no device copy = passphrase form ("Première ouverture sur cet appareil…"). Rust errors shown in FR/EN.
 - Lock: header lock button + auto-lock after 10 min idle (`localStorage solva-idle-min` overrides). Lock = save → `vault_lock` → page reload, so no decrypted data stays in memory. `.app` is `inert` under the lock screen.

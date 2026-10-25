@@ -7,10 +7,14 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
   const ic = (n) => `<svg class="lucide lucide-${n}" ${SVG}>${(window.ICONS || {})[n] || ''}</svg>`;
   const pref = () => { try { return JSON.parse(localStorage.getItem('solva-v3') || '{}') || {}; } catch (e) { return {}; } };
+  const BG_MS = 30000;
   const idleMin = () => { const v = parseFloat(localStorage.getItem('solva-idle-min')); return v > 0 ? v : IDLE_MIN; };
   let lang = pref().lang === 'en' ? 'en' : 'fr';
   let root = null, st = null, view = '', reason = '', busy = false, shown = false, locking = false;
-  const tx = () => VAULT_T[lang];
+  // On Android the device key is the phone lock (Keystore + fingerprint, face or PIN), not Windows Hello
+  const dev = (v) => typeof v === 'string' ? v.replace(/Utiliser Windows Hello/, 'Utiliser l’empreinte ou le NIP').replace(/Use Windows Hello/, 'Use fingerprint or PIN').replace(/Windows Hello/g, lang === 'en' ? 'your phone lock' : 'le verrouillage du téléphone')
+    : Array.isArray(v) ? v.map(dev) : v instanceof RegExp || typeof v !== 'object' || !v ? v : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dev(x)]));
+  const tx = () => (st && st.device === 'keystore' ? dev(VAULT_T[lang]) : VAULT_T[lang]);
   const $v = (sel) => root && root.querySelector(sel);
   const msg = (e) => { const s = String(e).replace(/^Error:\s*/, ''); const m = tx().errs.find(([re]) => re.test(s)); return m ? m[1] : s; };
 
@@ -32,7 +36,7 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
   }
   const errLine = () => '<p class="vault-err" role="alert"></p>';
   const lockHead = (lead) => `<div class="vault-badge">${ic('lock')}</div><h1 id="vault-h" tabindex="-1">${tx().lockedH}</h1><p class="vault-lead">${lead}</p>`;
-  const why = () => (reason === 'idle' ? tx().idle(Math.round(idleMin() * 10) / 10) : reason === 'manual' ? tx().manual : tx().lockedP);
+  const why = () => (reason === 'bg' ? tx().bg : reason === 'idle' ? tx().idle(Math.round(idleMin() * 10) / 10) : reason === 'manual' ? tx().manual : tx().lockedP);
 
   const VIEWS = {
     create: () => `<h1 id="vault-h" tabindex="-1">${tx().createH}</h1><p class="vault-lead">${tx().createP}</p>
@@ -139,7 +143,13 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'].forEach((ev) => addEventListener(ev, seen, { passive: true, capture: true }));
     const check = () => { if (Date.now() - last >= idleMin() * 60000) lock('idle'); };
     setInterval(check, 5000);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+    // Android: left in the background (or the screen off) for more than 30 s = locked on return
+    let away = 0;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { away = Date.now(); return; }
+      if (st && st.device === 'keystore' && away && Date.now() - away > BG_MS) lock('bg'); else check();
+      away = 0;
+    });
   }
   function addLockButton() {
     const s = document.querySelector('.bar .settings');

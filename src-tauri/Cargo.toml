@@ -27,6 +27,9 @@ hkdf = "0.12"
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = ["Foundation", "Security_Credentials", "Security_Cryptography", "Storage_Streams", "Win32_Foundation", "Win32_UI_WindowsAndMessaging"] }
 
+[target.'cfg(target_os = "android")'.dependencies]
+tauri-plugin-keystore = { path = "plugins/keystore" }
+
 # Argon2id (64 MB, 3 passes) is far too slow unoptimized: keep debug builds' unlock time close to release
 [profile.dev.package.argon2]
 opt-level = 3
