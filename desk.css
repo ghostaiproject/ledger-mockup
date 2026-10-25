@@ -1,12 +1,12 @@
 /* Solva desk: review, engine settings, calendar, guided tour. Same tokens as style.css. */
-:root { --k-tax: var(--ring); --hover: rgba(46, 122, 89, .06); }
-[data-theme="dark"] { --hover: rgba(143, 214, 176, .06); }
+:root { --k-tax: var(--ring); --hover: rgba(138, 98, 68, .1); }
+[data-theme="dark"] { --hover: rgba(218, 241, 222, .08); }
 
 /* polish: headings and cards get a little more depth */
 h1 { font-size: clamp(30px, 4.6vw, 40px); }
 .screen > h1 + .lead { max-width: 60ch; }
 .card { border: 1px solid transparent; }
-[data-theme="dark"] .card { border-color: rgba(143, 214, 176, .06); background: linear-gradient(180deg, rgba(143, 214, 176, .025), rgba(143, 214, 176, 0) 40%), var(--surface); }
+[data-theme="dark"] .card { border-color: rgba(255, 255, 255, .05); background: linear-gradient(180deg, rgba(201, 162, 126, .035), rgba(201, 162, 126, 0) 40%), var(--surface); }
 .btn, .round, .chip, .cal-day { transition: background .2s, color .2s, box-shadow .2s, transform .1s; }
 .btn:hover, .round:hover { box-shadow: 0 0 0 3px var(--hover); }
 :focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
@@ -44,7 +44,7 @@ h1 { font-size: clamp(30px, 4.6vw, 40px); }
 .tx { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 52px; grid-template-areas: 'sel main amt mark' 'sel acct acct mark' 'sel why why conf'; gap: 8px 12px; align-items: center;
   padding: 14px 14px 14px 12px; background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); border-left: 4px solid transparent; }
 .tx.flag { border-left-color: var(--amber); }
-.tx.low { border-left-color: #7aa7ff; }
+.tx.low { border-left-color: #7d8ea3; }
 .tx.ok { background: linear-gradient(90deg, var(--tint), var(--surface) 40%); }
 .tx .sel { grid-area: sel; align-self: start; padding-top: 4px; }
 .tx .sel input { width: 22px; height: 22px; accent-color: var(--accent); }

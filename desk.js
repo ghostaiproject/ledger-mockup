@@ -412,7 +412,7 @@ function parseVal(raw, kind) {
 }
 
 /* ---------- calendar: dates worked out from each client's profile ---------- */
-const KCOL = { tax: 'var(--ring)', das: 'var(--amber)', inst: '#7aa7ff', corp: 'var(--red)', pers: '#c28bff', slips: '#4fc3c3', mine: 'var(--muted)' };
+const KCOL = { tax: 'var(--ring)', das: 'var(--amber)', inst: '#7d8ea3', corp: 'var(--red)', pers: '#a07c94', slips: '#7fa889', mine: 'var(--muted)' };
 const me2 = (y, m) => new Date(y, m + 1, 0); // month end, months may overflow
 function rawEvents(y, m) { // what is due in month m (0-11) of year y, before weekend moves
   const out = [], K = tp().cal.ev, mm = ((m % 12) + 12) % 12;

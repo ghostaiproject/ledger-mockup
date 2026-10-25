@@ -54,7 +54,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     shots = [('Landing', shot(b, '', 1440, 900)),
              ('Desktop · Review (tour step 5)', shot(b, '#/review', 1440, 900, sample=True, tour=4)),
-             ('Desktop · Calendar · light', shot(b, '#/calendar', 1440, 900, light=True)),
+             ('Landing · light', shot(b, '', 1440, 900, light=True)),
              ('Desktop · Engine', shot(b, '#/engine', 1440, 900)),
              ('Phone · Tour step 3', shot(b, '#/auto', 390, 844, mobile=True, sample=True, tour=2)),
              ('Phone · Calendar', shot(b, '#/calendar', 390, 844, mobile=True)),
