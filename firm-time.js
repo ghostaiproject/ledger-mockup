@@ -1,4 +1,4 @@
-// Solva · time and billing: timer, time entries, budget vs actual, WIP per engagement and client invoices.
+// Folio · time and billing: timer, time entries, budget vs actual, WIP per engagement and client invoices.
 function renderTime() {
   const el = $('#timeOut'); if (!el) return;
   const T_ = tf().time, F = state.firm, f = F.tFilter || 'all';
@@ -82,7 +82,7 @@ document.addEventListener('click', (ev) => {
   else if (ds.tCsv) {
     const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
     const rows = [['date', 'staff', 'engagement', 'work', 'hours', 'rate', 'amount', 'billed'], ...F.time.map((x) => [isoOf(x.date), x.who, x.eng, x.note.fr, x.h, staff(x.who).rate, x.h * staff(x.who).rate, x.billed ? 'yes' : 'no'])];
-    saveFile('solva-temps.csv', '﻿' + rows.map((r) => r.map(q).join(',')).join('\n'), 'text/csv;charset=utf-8'); return;
+    saveFile('folio-temps.csv', '﻿' + rows.map((r) => r.map(q).join(',')).join('\n'), 'text/csv;charset=utf-8'); return;
   }
   else return;
   render();

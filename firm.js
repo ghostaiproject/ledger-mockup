@@ -1,4 +1,4 @@
-// Solva · public accounting firm screens: engagements, client requests (PBC), the "More" index, and Today's firm tasks.
+// Folio · public accounting firm screens: engagements, client requests (PBC), the "More" index, and Today's firm tasks.
 // Loaded before app.js (after firm-data.js and firm-i18n*.js); runs at render time.
 const engOf = (id) => state.firm.eng.find((e) => e.id === id);
 const clientOf = (e) => CLIENTS.find((c) => c.id === e.client) || { name: e.client, short: e.client };
@@ -16,7 +16,7 @@ function firmTasks() { // added to Today in app.js; a firm's day starts with the
   return [
     { id: 'ye', go: '#/yearend', icon: 'folder-open', tone: 'amber', done: () => !!F().ye.sign.partner, arg: () => F().ye.aje.filter((a) => a.st === 'proposed').length || 0 },
     { id: 'pbc', go: '#/requests', icon: 'inbox', tone: '', done: () => !F().pbc.some((p) => p.st !== 'received'), arg: () => F().pbc.filter((p) => p.st !== 'received').length },
-    { id: 'letter', go: '#/engagements', icon: 'briefcase', tone: '', done: () => engOf('boreal-rev').letter, arg: () => '', open: 'boreal-rev' },
+    { id: 'letter', go: '#/engagements', icon: 'briefcase', tone: '', done: () => !engOf('boreal-rev') || !!engOf('boreal-rev').letter, arg: () => '', open: 'boreal-rev' },
     { id: 'wip', go: '#/time', icon: 'timer', tone: '', done: () => F().eng.every((e) => wipOf(e.id) < 1), arg: () => money(F().eng.reduce((s, e) => s + wipOf(e.id), 0)) },
   ];
 }

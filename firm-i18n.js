@@ -1,4 +1,4 @@
-// Solva · words for the firm screens (engagements, year-end file, client requests, time & billing). FR-CA / EN-CA.
+// Folio · words for the firm screens (engagements, year-end file, client requests, time & billing). FR-CA / EN-CA.
 const TF = {
   fr: {
     navGroups: ['Cabinet', 'Dossiers', 'Clients et livres'],
@@ -32,11 +32,12 @@ const TF = {
       std: 'au taux standard', rate: (r) => `${r} $/h`,
     },
     ye: {
+      none: 'Aucun dossier de fin d’exercice pour l’instant. Il apparaîtra ici avec votre premier mandat de compilation.',
       title: 'Dossier de fin d’exercice', client: 'Érablière Deux-Pins inc.', period: 'Exercice clos le 30 juin 2026',
       views: { tb: 'Balance', aje: 'Écritures', lead: 'Feuilles sommaires', fs: 'États financiers' },
       cols: { acct: 'Compte', unadj: 'Non ajustée', adj: 'Ajust.', final: 'Ajustée', py: '2025', varc: 'Écart' },
       balanced: 'Balance équilibrée', unbalanced: (d) => `Écart de ${d}`, totals: 'Totaux',
-      ajeLead: 'Écritures proposées par Solva à partir du dossier. Accepte, refuse ou ajoute la tienne.',
+      ajeLead: 'Écritures proposées par Folio à partir du dossier. Accepte, refuse ou ajoute la tienne.',
       accept: 'Accepter', reject: 'Refuser', reopen: 'Revoir', accepted: 'Acceptée', rejected: 'Refusée', proposed: 'Proposée',
       addAje: 'Ajouter une écriture', dr: 'Débit', cr: 'Crédit', amt: 'Montant', desc: 'Description', addBtn: 'Ajouter',
       leadLead: 'Chaque poste des états, avec l’an passé. Les écarts de plus de 10 % et de 5 000 $ sont à expliquer.', explain: 'À expliquer',
@@ -58,7 +59,7 @@ const TF = {
       letter: ['Mandat', 'Lettre de mission à faire signer', () => 'Atelier Boréal · mission d’examen 2026', 'Ouvrir le mandat'],
       wip: ['Facturation', 'TEC à facturer', (a) => `${a} de travaux en cours non facturés`, 'Ouvrir le temps'],
     },
-    more: { title: 'Tout Solva', lead: 'Toutes les sections du cabinet.' },
+    more: { title: 'Tout Folio', lead: 'Toutes les sections du cabinet.' },
     moreDesc: { engagements: 'Étapes, équipe et budget de chaque mandat', yearend: 'Balance, écritures, états financiers', requests: 'Documents à obtenir des clients', time: 'Heures, TEC et factures', clients: 'Le portefeuille et le profil fiscal', auto: 'Tenue de livres à partir du relevé', review: 'Exceptions, contrôles, signatures', calendar: 'Échéances ARC et Revenu Québec', money: 'Comptes clients du cabinet', close: 'Fin de mois du client', engine: 'Réglages du pilote auto' },
   },
 };

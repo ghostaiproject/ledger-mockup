@@ -1,4 +1,4 @@
-// Solva guided sample: the whole job on fake files, one real step at a time (files in → Autopilot → exceptions → engine setting →
+// Folio guided sample: the whole job on fake files, one real step at a time (files in → Autopilot → exceptions → engine setting →
 // batch review → tie-outs + preparer sign-off → reviewer sign-off → calendar filing → client delivery). Every step uses the real actions.
 const TOUR = {
   fr: {
@@ -35,7 +35,7 @@ const TOUR_SPOT = ['#autoFeed', '#autoOut .stats', '#autoOut .reviews', '#set-du
 const wait = (ms) => new Promise((ok) => setTimeout(ok, calm ? 0 : ms));
 function tourStart() {
   resetAuto(); state.auto.client = 'boreal';
-  state.auto.files = SolvaEngine.sample(isoToday());
+  state.auto.files = FolioEngine.sample(isoToday());
   state.tour = { i: 0, busy: false };
   if (location.hash !== '#/auto') location.hash = '#/auto'; else render();
   tourSpot();

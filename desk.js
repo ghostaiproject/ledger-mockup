@@ -1,4 +1,4 @@
-// Solva desk: the accountant's side of Autopilot. Review every decision with its reason, override, approve in batches, sign off;
+// Folio desk: the accountant's side of Autopilot. Review every decision with its reason, override, approve in batches, sign off;
 // tune every engine setting with a change log; one calendar of CRA / Revenu Québec dates across the whole client list.
 // Loaded before app.js; everything here runs at render time, when app.js's state, t() and helpers exist.
 const TP = {
@@ -163,25 +163,18 @@ const TP = {
   },
 };
 const tp = () => TP[state.lang];
-const E_ = () => SolvaEngine;
+const E_ = () => FolioEngine;
 
 /* ---------- state (app.js merges this in) ---------- */
 function deskInit() {
   const d = { settings: {}, setLog: [], rv: freshReview(), cal: { y: TODAY.getFullYear(), m: TODAY.getMonth(), sel: isoOf(TODAY), client: 'all', off: [], mine: [] } };
-  try {
-    const s = JSON.parse(localStorage.getItem('solva-desk') || '{}');
-    if (s.settings) d.settings = s.settings;
-    if (Array.isArray(s.setLog)) d.setLog = s.setLog;
-    if (Array.isArray(s.mine)) d.cal.mine = s.mine;
-    if (s.who) d.rv.who = s.who;
-  } catch (e) { /* storage blocked: defaults */ }
   return d;
 }
 function deskSeed() { // a firm's real calendar: what was due before today is already filed, except Café Mistral's late return
   for (let i = -3; i <= 0; i++) monthEvents(TODAY.getFullYear(), TODAY.getMonth() + i).forEach((e) => { if (e.date < TODAY && e.client && e.client.id !== 'mistral') state.filed.add(e.id); });
 }
 function freshReview(who) { return { filter: 'flags', sel: [], marks: {}, explained: {}, sign: { prep: null, rev: null }, role: 'prep', who: who || { prep: 'JT', rev: 'MB' }, log: [] }; }
-function deskSave() { try { localStorage.setItem('solva-desk', JSON.stringify({ settings: state.settings, setLog: state.setLog.slice(-200), mine: state.cal.mine, who: state.rv.who })); } catch (e) { /* ignore */ } }
+function deskSave() { Bind.flush(); } // settings, log, reminders, initials: saved through the store (store-bind.js)
 const isoOf = (d) => [d.getFullYear(), d.getMonth() + 1, d.getDate()].map((x) => String(x).padStart(2, '0')).join('-');
 const stamp = () => new Date().toLocaleString(loc(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const me = () => state.rv.who[state.rv.role] || '—';
@@ -406,7 +399,7 @@ async function changeSetting(mutate, label, from, to) {
 function parseVal(raw, kind) {
   if (kind === 'freq') return raw;
   if (kind === 'list') return raw.split(/[\s,;]+/).filter(Boolean).map(Number).filter((n) => !isNaN(n));
-  const n = SolvaEngine.num(raw);
+  const n = FolioEngine.num(raw);
   if (n == null || n < 0) return null;
   return kind === 'pct' ? Math.round(n * 1000) / 100000 : kind === 'int' ? Math.round(n) : n;
 }
@@ -505,15 +498,15 @@ function renderCalendar() {
     <button class="btn soft" data-cal-ics="1"><i data-lucide="download"></i>${C.ics}</button>`;
 }
 function calIcs() { // the next 12 months, for the client filter in use
-  const out = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Solva//Calendrier//FR', 'CALSCALE:GREGORIAN'];
+  const out = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Folio//Calendrier//FR', 'CALSCALE:GREGORIAN'];
   const d8 = (d) => isoOf(d).replace(/-/g, '');
   for (let i = 0; i < 12; i++) monthEvents(TODAY.getFullYear(), TODAY.getMonth() + i).forEach((e) => {
     const n = new Date(e.date.getTime() + DAY);
-    out.push('BEGIN:VEVENT', `UID:${e.id}@solva`, `DTSTAMP:${d8(TODAY)}T000000Z`, `DTSTART;VALUE=DATE:${d8(e.date)}`, `DTEND;VALUE=DATE:${d8(n)}`,
+    out.push('BEGIN:VEVENT', `UID:${e.id}@folio`, `DTSTAMP:${d8(TODAY)}T000000Z`, `DTSTART;VALUE=DATE:${d8(e.date)}`, `DTEND;VALUE=DATE:${d8(n)}`,
       `SUMMARY:${(e.text + (e.client ? ' · ' + e.client.name : '')).replace(/[,;]/g, (c) => '\\' + c)}`, 'END:VEVENT');
   });
   out.push('END:VCALENDAR');
-  saveFile('solva-echeances.ics', out.join('\r\n'), 'text/calendar;charset=utf-8');
+  saveFile('folio-echeances.ics', out.join('\r\n'), 'text/calendar;charset=utf-8');
 }
 function nextDue(c) {
   const keep = { client: state.cal.client, off: state.cal.off };
@@ -555,7 +548,7 @@ document.addEventListener('click', (e) => {
     (r && r.ok ? rerun() : Promise.resolve(render())).then(() => toast(tp().eng.toastReset, () => { state.settings = prev; deskSave(); r && r.ok ? rerun() : render(); }));
     return;
   }
-  else if (ds.engExp) { saveFile('solva-reglages.json', JSON.stringify({ settings: eff(), memory: state.auto.memory }, null, 2), 'application/json'); return; }
+  else if (ds.engExp) { saveFile('folio-reglages.json', JSON.stringify({ settings: eff(), memory: state.auto.memory }, null, 2), 'application/json'); return; }
   else if (ds.engImp) { $('#setIn').click(); return; }
   else if (ds.ruleAdd) { changeSetting((S) => S.rules.push({ re: '\\bNOUVEAU FOURNISSEUR\\b', acct: 5100 }), tp().eng.sec.rules, S0(), S0() + 1); return; }
   else if (ds.ruleDel) { const i = +ds.ruleDel, old = eff().rules[i]; changeSetting((S) => S.rules.splice(i, 1), `${tp().eng.sec.rules} ${i + 1}`, old.re, '—'); return; }

@@ -1,0 +1,55 @@
+/* Lock / first-run screens (vault-ui.js), app only. Full screen above the app, one calm card. */
+.vault { position: fixed; inset: 0; z-index: 100; overflow-y: auto; display: flex; /* card margin:auto centers, yet a tall form still scrolls from its top */
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); background: var(--bg); color: var(--ink); }
+.vault-card { width: min(440px, 100%); margin: auto; }
+.vault-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 40px; }
+.vault-top .brand { font-size: 22px; }
+.vault-top .seg { flex: 0 0 auto; }
+.vault h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; letter-spacing: -.01em; outline: none; }
+.vault-lead { margin: 0 0 28px; color: var(--muted); font-size: 17px; line-height: 1.5; }
+.vault-badge { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: 20px; border-radius: 20px;
+  background: var(--tint); color: var(--accent-ink); }
+.vault-badge svg { width: 30px; height: 30px; }
+
+.vault-field { display: grid; gap: 8px; margin-bottom: 18px; }
+.vault-field label { font-weight: 600; }
+.vault-input { position: relative; }
+.vault-input input { width: 100%; min-height: 54px; padding: 0 56px 0 16px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); color: var(--ink); font: inherit; font-size: 17px; }
+.vault-input input:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; border-color: transparent; }
+.vault-eye { position: absolute; top: 5px; right: 5px; display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 10px; color: var(--muted); }
+.vault-eye:hover { color: var(--ink); background: var(--soft); }
+.vault-hint { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.45; }
+.vault-meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
+.vault-meter i { height: 6px; border-radius: 3px; background: var(--soft); transition: background .2s; }
+.vault-meter[data-level="1"] i:nth-child(-n+1) { background: var(--amber); }
+.vault-meter[data-level="2"] i:nth-child(-n+2) { background: var(--ring); }
+.vault-meter[data-level="3"] i { background: var(--ring); }
+.vault-meter-txt { min-height: 22px; font-weight: 600; }
+
+.vault-warn { display: flex; gap: 12px; margin: 6px 0 16px; padding: 14px 16px; border-radius: 16px;
+  background: var(--amber-tint); color: var(--ink); }
+.vault-warn svg { flex: 0 0 auto; width: 22px; height: 22px; margin-top: 2px; color: var(--amber); }
+.vault-warn b { display: block; margin-bottom: 2px; }
+.vault-warn p { margin: 0; font-size: 15px; line-height: 1.45; }
+.vault-err { min-height: 24px; margin: 12px 0; color: var(--red); font-weight: 600; }
+.vault-err:empty { margin: 8px 0; min-height: 0; }
+.vault .btn svg { width: 22px; height: 22px; }
+.vault .btn:disabled { opacity: .7; cursor: progress; }
+.vault-link { display: block; min-height: 48px; margin: 12px auto 0; padding: 8px 16px; color: var(--accent-ink);
+  font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+.vault-choice { display: grid; gap: 12px; }
+.vault-opt { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 84px; padding: 16px 18px; text-align: left;
+  border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
+  transition: border-color .2s, transform .1s; }
+.vault-opt:hover { border-color: var(--ring); }
+.vault-opt:active { transform: scale(.99); }
+.vault-opt > span:nth-child(2) { flex: 1; display: grid; gap: 2px; }
+.vault-opt b { font-size: 18px; }
+.vault-opt small { color: var(--muted); font-size: 15px; line-height: 1.4; }
+.vault-opt-ic { display: grid; place-items: center; flex: 0 0 auto; width: 48px; height: 48px; border-radius: 14px;
+  background: var(--tint); color: var(--accent-ink); }
+.vault-opt > svg { flex: 0 0 auto; color: var(--muted); }
+@media (min-width: 720px) { .vault h1 { font-size: 34px; } .vault-top { margin-bottom: 56px; } }

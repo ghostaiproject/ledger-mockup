@@ -1,6 +1,29 @@
-# Solva (ledger-mockup) · handoff
+# Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, public accounting + computer first)
+## LATEST (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
+- Rename: Solva → Folio everywhere (exe `folio.exe`, id `ca.folio.app`, env `FOLIO_DATA_DIR` / `FOLIO_DEVICE`). Storage keys kept (`solva-v3`, `solva-store-web`, `solva-idle-min`, `solva-lock`, HMAC label `solva-name`) so nothing needs migrating.
+- Screens: `vault-ui.js` + `vault-ui.css` + `vault-i18n.js` (FR/EN), app only (null on the web demo). First run = create (passphrase twice, min 10, strength meter, "keep it safe" warning, Hello note) → "Par où commencer?" (Cabinet vide / Charger l'exemple). Locked = Windows Hello button first (opens by itself at start, not after a lock) + "Utiliser ma phrase secrète"; no device copy = passphrase form ("Première ouverture sur cet appareil…"). Rust errors shown in FR/EN.
+- Lock: header lock button + auto-lock after 10 min idle (`localStorage solva-idle-min` overrides). Lock = save → `vault_lock` → page reload, so no decrypted data stays in memory. `.app` is `inert` under the lock screen.
+- Empty firm: record `one/start` = 'empty' clears the firm lists (engagements, hours, invoices, requests, AJEs, reminders, own calendar items) on every start. Clients, deadlines, autopilot bank sample and the Deux-Pins trial balance are still sample data in an empty firm (they need real empty states: follow-up). Fixed crashes: Today letter/reminder tasks, year-end screen (new empty state).
+- `interimUnlock()` prompts are gone: `StoreNative.open(start)` is the gate, `whenOpen()` shows the screens.
+- `tools/app_check.mjs` drives the real screens: 18 checks (create form errors, meter, sample, restart, passphrase form, re-wrap, idle lock wipes memory, empty firm on 15 routes, empty stays empty). Contact sheet of the 16 views (light/dark × phone/desktop): `shots/vault-sheet.jpg`. Hand test of the new screens with real Hello: NOT done yet.
+
+## Before (2026-10-25, Tauri app: step 4 vault keys)
+- Vault: random DEK wrapped twice: Windows Hello (`hello_win.rs`, sign → HKDF) in `vault.local.json` + Argon2id passphrase in `vault.json` (goes to the cloud in step 5). Dev key file gone (adopted as DEK on create). Release builds now open too.
+- Tauri: `vault_status` {state new|locked|open, device, deviceReady, minPass}, `vault_create(pass)`, `vault_unlock(pass?)` (none = Hello), `vault_lock`. JS: `StoreNative.vault.*`, `Store.ready()` waits for open.
+- Until the screens: `store-native.js` `interimUnlock()` uses Hello, else `prompt()` (create asks twice). Replace with lock/onboarding screens (Next 2, /crew) + idle auto-lock.
+- `tools/app_check.mjs` runs with `FOLIO_DEVICE=file` (debug-only test device key, no prompt): 11 checks (create, short pass, restart, wrong pass, re-wrap, lock). Real Hello tried by hand 2026-10-25: create (passphrase + Hello), restart opens with Hello only, data back, nothing readable on disk.
+
+## Before (2026-10-25, Tauri app: Next 1 scaffold)
+- Plan: `docs/APP-PLAN.md` (layout, Store API, keys/unlock, disk format, sync, CI, order of work). Decided: Google Drive first, unsigned builds for now, Windows tools local / Android in CI.
+- Scaffold: `package.json` (@tauri-apps/cli), `tools/build_web.mjs` (web files → `dist/`, stamps ?v=), `src-tauri/` (conf, Cargo, lib.rs with `app_info`, capabilities, icons from `app-icon.png` placeholder). Pages workflow untouched.
+- Toolchain on this PC: rustup stable (MSVC) + VS 2022 C++ Build Tools. Cargo is in `%USERPROFILE%\.cargo\bin` (new shells only).
+- Build: `npx tauri build --debug --no-bundle` → `src-tauri/target/debug/folio.exe`. Next: plan step 4 (vault: Windows Hello device key, passphrase, lock/unlock + onboarding screens; use /crew for the screens, the `grapp` skill for defaultable choices).
+- Step 3 done: encrypted records + documents on disk (`src-tauri/src/crypt.rs`, `disk.rs`, `vault.rs` dev key, `store-native.js`). Check everything with `npm run check` (cargo on PATH: `%USERPROFILE%\.cargo\bin`).
+- Step 2 done: `store.js` (Store API, web backend: firm data in memory, own settings in localStorage `solva-store-web`, migrates old `solva-memory`/`solva-desk`) + `store-bind.js` (`render()` → `Bind.flush()` diffs and saves changed records). Checked: no errors on 15 routes × phone/desktop × light/dark; desktop dense rows (pbcAsk/pbcSt/task/eng buttons) are <44 px on main too (not new).
+- Local preview: launch config `folio-app` (port 5177) in Desktop\New folder\.claude\launch.json; 5174 is often taken.
+
+## Before (2026-10-25, public accounting + computer first)
 - Built for a CPA firm first. New screens: `#/engagements` (compilation NCSC 4200, review NCME 2400, T2/CO-17, T1/TP-1, bookkeeping; 7 stages with gates: letter, independence, client docs, year-end sign-offs), `#/yearend` (Deux-Pins at 2026-06-30: trial balance, 4 proposed AJEs incl. tax 12.2 %, lead sheets with variance flags, compiled statements + compilation report, preparer → reviewer → partner sign-off, print, CSV), `#/requests` (PBC list per engagement), `#/time` (timer, entries, budget vs actual, WIP, bill → invoice, CSV), `#/more` (phone index).
 - Code: `firm-data.js` (staff, engagements, time, PBC, TB), `firm-i18n.js` + `firm-i18n-en.js` (`tf()`), `firm.js` (engagements, requests, more, Today tasks), `firm-time.js`, `yearend.js`, `firm.css` (firm styles + computer-first layout: 1560px app, grouped side bar, dense rows).
 - Phone bar = Today, Engagements, Calendar, Review, More. Computer = every section in 3 groups.

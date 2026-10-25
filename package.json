@@ -1,0 +1,16 @@
+{
+  "name": "folio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Folio desktop/Android app (Tauri 2). The web demo needs none of this.",
+  "scripts": {
+    "web": "node tools/build_web.mjs",
+    "tauri": "tauri",
+    "app:dev": "tauri dev",
+    "app:build": "tauri build",
+    "check": "node tools/engine_test.js && cargo test --manifest-path src-tauri/Cargo.toml --quiet && tauri build --debug --no-bundle && node tools/app_check.mjs"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.0"
+  }
+}

@@ -11,7 +11,8 @@ NAMES = ('arrow-right calendar-clock check chevron-down circle-check landmark li
          'send sprout sun users wallet wand-sparkles file-up download copy rotate-ccw sparkles triangle-alert '
          'calendar-days chevron-left chevron-right shield-check sliders-horizontal pen-line circle-x circle-minus plus trash-2 '
          'upload history scale info search calendar-plus file-check '
-         'briefcase folder-open timer inbox printer file-text layout-grid receipt play square clock').split()
+         'briefcase folder-open timer inbox printer file-text layout-grid receipt play square clock '
+         'lock lock-open fingerprint eye eye-off key-round folder-plus').split()
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'icons.js'
 
 with sync_playwright() as p:

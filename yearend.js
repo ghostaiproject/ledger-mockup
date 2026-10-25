@@ -1,4 +1,4 @@
-// Solva · year-end file (public accounting): trial balance, adjusting entries, lead sheets, compiled statements, sign-offs.
+// Folio · year-end file (public accounting): trial balance, adjusting entries, lead sheets, compiled statements, sign-offs.
 // Uses firm-data.js (YE_TB, YE_AJE) and app.js helpers at render time.
 const yeS = () => state.firm.ye;
 const yeEng = () => state.firm.eng.find((e) => e.ye);
@@ -45,6 +45,7 @@ function yeBlockers(c) {
 
 function renderYearend() {
   const el = $('#yeOut'); if (!el) return;
+  if (!yeEng()) { el.innerHTML = `<div class="card empty"><i data-lucide="folder-open"></i><p>${tf().ye.none}</p></div>`; return; } // empty firm
   const Y = tf().ye, S = yeS(), c = yeCalc();
   const tabs = Object.entries(Y.views).map(([k, v]) => `<button role="radio" aria-checked="${S.view === k}" data-ye-view="${k}">${v}</button>`).join('');
   const ok = !c.diff;
