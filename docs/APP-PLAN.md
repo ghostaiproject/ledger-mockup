@@ -62,7 +62,13 @@ Collections: `eng`, `time`, `invoices`, `pbc`, `ye`, `memory` (Autopilot), `desk
 setLog, sign-offs), `clients`, `deadlines`. Each record carries
 `{ id, rev, at (hybrid clock), dev (device id), del? }`.
 
-Code changes this needs (small, mechanical):
+Done (step 2): `store.js` (API + web backend) and `store-bind.js` (state ↔ records). Instead of a
+`Store.put` at each of ~40 mutation points, `render()` ends with `Bind.flush()`, which diffs each bound
+record against what was last saved and puts/deletes only what changed (undo included). Bound now:
+eng, time, invoices, pbc, aje, chase, mine (lists) + yeSign, memory, settings, setLog, who, filed,
+checks (single records). Not bound yet: the Autopilot run/review state and CLIENTS (per-run demo state).
+
+Original notes:
 - `firm-data.js` `firmInit()` → split persisted data from UI-only bits (`open`, `tFilter`, `timer`).
 - `app.js:224-229, 603` and `desk.js:172, 184`: `solva-memory` / `solva-desk` move to `Store`;
   `solva-v3` (lang/theme) stays in localStorage.
