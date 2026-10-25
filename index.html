@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solva · Cabinet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=optional" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="preload" href="assets/icons.js" as="script">
+<link rel="preload" href="app.js" as="script">
+<!-- sections are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
+<script>document.documentElement.classList.add('booting'); setTimeout(() => document.documentElement.classList.remove('booting'), 3000);</script>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand"><span class="logo"><i data-lucide="scale"></i></span><b>Solva</b></div>
+    <nav class="nav" aria-label="Sections" data-i18n-label="sections">
+      <a class="active" aria-current="true" href="#top"><i data-lucide="layout-dashboard"></i><span data-i18n="navOverview"></span></a>
+      <a href="#deadlines"><i data-lucide="calendar-clock"></i><span data-i18n="navDeadlines"></span></a>
+      <a href="#clients"><i data-lucide="users"></i><span data-i18n="navClients"></span></a>
+      <a href="#banking"><i data-lucide="landmark"></i><span data-i18n="navBanking"></span></a>
+      <a href="#close"><i data-lucide="list-checks"></i><span data-i18n="navClose"></span></a>
+    </nav>
+    <div class="side-card">
+      <i data-lucide="timer"></i>
+      <p data-i18n="billable"></p>
+      <b class="mono" id="hoursSide">0 h</b>
+      <span class="bar"><span id="hoursBar"></span></span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top" id="top">
+      <div>
+        <p class="eyebrow" id="date"></p>
+        <h1 id="greet"></h1>
+        <p class="sub" data-i18n="tagline"></p>
+      </div>
+      <div class="toggles">
+        <div class="seg" role="radiogroup" data-i18n-label="language">
+          <span class="seg-ind"></span>
+          <button role="radio" data-lang="fr" lang="fr-CA">FR</button>
+          <button role="radio" data-lang="en" lang="en-CA">EN</button>
+        </div>
+        <div class="seg" role="radiogroup" data-i18n-label="theme">
+          <span class="seg-ind"></span>
+          <button role="radio" data-theme-set="day"><i data-lucide="sun"></i><span data-i18n="day"></span></button>
+          <button role="radio" data-theme-set="night"><i data-lucide="moon"></i><span data-i18n="night"></span></button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero card">
+      <div class="pulse">
+        <svg viewBox="0 0 120 120" class="ring" aria-hidden="true">
+          <circle cx="60" cy="60" r="50" class="ring-bg"/>
+          <circle cx="60" cy="60" r="50" class="ring-fg" id="pulseRing"/>
+        </svg>
+        <div class="pulse-num"><b class="mono" id="pulseScore">0</b><span data-i18n="pulse"></span><em id="pulseWord"></em></div>
+      </div>
+      <div class="pulse-text">
+        <p class="eyebrow" data-i18n="nextBest"></p>
+        <p id="pulseTip"></p>
+      </div>
+      <ul class="hero-stats">
+        <li><i data-lucide="wallet"></i><b class="mono" id="statCash"></b><span data-i18n="statCash"></span></li>
+        <li><i data-lucide="hand-coins"></i><b class="mono" id="statAR"></b><span data-i18n="statAR"></span></li>
+        <li><i data-lucide="triangle-alert"></i><b class="mono" id="statLate"></b><span data-i18n="statLate"></span></li>
+        <li><i data-lucide="calendar-clock"></i><b id="statNext"></b><span data-i18n="statNext"></span></li>
+      </ul>
+    </section>
+
+    <section class="card" id="deadlines">
+      <div class="card-head"><h2 data-i18n="deadlines"></h2><span class="pill" id="dlPill"></span></div>
+      <ul class="dl" id="dlList"></ul>
+    </section>
+
+    <section class="card clients" id="clients">
+      <div class="card-head">
+        <h2 id="clientsTitle" data-i18n="clients"></h2>
+        <div class="chips" id="clientTabs" role="tablist" aria-labelledby="clientsTitle"></div>
+      </div>
+      <div id="clientPanel" role="tabpanel">
+        <ul class="files" id="files"></ul>
+      </div>
+    </section>
+
+    <section class="card close" id="close">
+      <div class="card-head"><h2 id="closeTitle"></h2><span class="pill" id="closePill"></span></div>
+      <div class="progress" aria-hidden="true"><span id="closeBar"></span></div>
+      <ul class="checks" id="checks"></ul>
+    </section>
+  </main>
+
+  <aside class="rail">
+    <section class="card aging">
+      <div class="card-head">
+        <h2 data-i18n="aging"></h2>
+        <div class="seg small" role="radiogroup" data-i18n-label="aging">
+          <span class="seg-ind"></span>
+          <button role="radio" data-book="ar" data-i18n="ar"></button>
+          <button role="radio" data-book="ap" data-i18n="ap"></button>
+        </div>
+      </div>
+      <b class="mono big" id="agingTotal"></b>
+      <div class="stack" id="agingBar" role="img"></div>
+      <ul class="buckets" id="buckets"></ul>
+    </section>
+
+    <section class="card chase">
+      <div class="card-head"><h2 data-i18n="chase"></h2><span class="pill" id="chasePill"></span></div>
+      <ul class="rows" id="chaseList"></ul>
+    </section>
+
+    <section class="card bank" id="banking">
+      <div class="card-head"><h2 data-i18n="recon"></h2><span class="pill" id="reconPill"></span></div>
+      <ul class="rows" id="banks"></ul>
+      <button class="btn wide" data-match="all"><i data-lucide="wand-sparkles"></i><span data-i18n="autoMatch"></span></button>
+    </section>
+  </aside>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="assets/icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
