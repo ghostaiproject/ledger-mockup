@@ -1,6 +1,12 @@
 # Solva (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, branch ccr-05297e01-5ze1ek, not merged to main yet)
+## LATEST (2026-10-25, main a70240a, live)
+- Accountant workbench: `#/review` (method + reason + confidence per line, override, batch approve, 10 tie-outs, preparer/reviewer sign-off voided by later changes, audit CSV), `#/engine` (every engine setting, rule tester, change log, JSON export/import), `#/calendar` (deadlines from client `profile`, .ics). Code: `desk.js` + `desk.css`.
+- Sample button = 9-step guided tour (`tour.js`) doing the real actions end to end.
+- Palette: black/white + walnut brown (`--ring` #8a6244 / dark #c9a27e) + #DAF1DE; buttons ink with mint text. New /ceig hero art (desk, charcoal + walnut).
+- Engine: `run({settings})`, `DEFAULTS`, `settingsOf`; each bank line has `how/why/conf`, entries have `src`, result has `checks`.
+
+## Earlier (branch ccr-05297e01-5ze1ek, merged)
 - Palette: green toned down. Brand tint `#DAF1DE` (user's pick) on neutral white/ink; primary buttons = ink with mint text; green only for "done"/progress (`--ring`).
 - Light is the default theme now (storage key bumped to `solva-v3`). Dark = charcoal `#0e1110` + mint accent, not deep green.
 - Tokens in `style.css`: `--tint` (#DAF1DE fills), `--soft` (neutral tracks: progress, ring, seg, drop zone), `--raised` (selected seg/filter tab), `--frame` (phone mockup).
@@ -11,7 +17,6 @@
 - Verified: engine test OK; Playwright all 7 screens × phone/desktop × light/dark: no overflow, no JS errors, targets ≥44 px. NOT verified on a real phone.
 
 ## Open
-- Merge the branch to main (GitHub Pages serves main).
 - Autopilot review titles are raw bank text (UPPERCASE) → clean name + bank text small.
 - Clients screen sparse (2 clients) → next-step line per client, empty state for "Prêts".
 - Money split bar mostly red → show late amount as a number, smaller bar.
