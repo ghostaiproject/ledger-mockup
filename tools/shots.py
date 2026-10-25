@@ -32,13 +32,13 @@ def sheet(page, shots):
     page.screenshot(path=OUT / 'sheet.jpg', full_page=True, type='jpeg', quality=60)
 
 
-def shot(b, route, w, h, dark=False, full=False, mobile=False):
+def shot(b, route, w, h, light=False, full=False, mobile=False):
     pg = b.new_page(viewport={'width': w, 'height': h}, device_scale_factor=2 if mobile else 1, is_mobile=mobile, has_touch=mobile)
     pg.goto(URL + route, wait_until='networkidle')
-    if dark:
+    if light:  # dark is the default; the toggle switches to light
         pg.click('[data-theme-toggle]')
     pg.wait_for_timeout(600)
-    name = (route.strip('#/') or 'home') + ('-dark' if dark else '') + ('-phone' if mobile else '')
+    name = (route.strip('#/') or 'home') + ('-light' if light else '') + ('-phone' if mobile else '')
     return pg.screenshot(path=OUT / f'{name}.png', full_page=full)
 
 
@@ -47,7 +47,7 @@ with sync_playwright() as p:
     shots = [('Landing', shot(b, '', 1440, 900)),
              ('Desktop · Today', shot(b, '#/today', 1440, 900)),
              ('Phone · Today', shot(b, '#/today', 390, 844, mobile=True)),
-             ('Phone · Clients · dark', shot(b, '#/clients', 390, 844, dark=True, mobile=True)),
+             ('Phone · Clients · light', shot(b, '#/clients', 390, 844, light=True, mobile=True)),
              ('Phone · Money', shot(b, '#/money', 390, 844, mobile=True))]
     sheet(b.new_page(), shots)
     b.close()

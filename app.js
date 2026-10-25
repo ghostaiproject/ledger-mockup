@@ -92,7 +92,7 @@ const CLIENTS = [
 
 const state = {
   lang: 'fr',
-  theme: 'light',
+  theme: 'dark',
   route: 'home',
   filter: 'action',
   open: null,
@@ -116,11 +116,11 @@ const state = {
   ],
 };
 try { // per-viewer conveniences only
-  const saved = JSON.parse(localStorage.getItem('solva') || '{}');
+  const saved = JSON.parse(localStorage.getItem('solva-v2') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
 } catch (e) { /* storage blocked: defaults are fine */ }
-function save() { try { localStorage.setItem('solva', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
+function save() { try { localStorage.setItem('solva-v2', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
 const $ = (s) => document.querySelector(s);
 const t = () => T[state.lang];
