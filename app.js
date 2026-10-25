@@ -7,7 +7,7 @@ const T = {
     pulse: 'Pouls du cabinet', nextBest: 'Prochaine action', statCash: 'Encaisse clients', statAR: 'Comptes clients',
     statLate: 'En retard (+30 j)', statNext: 'Prochaine échéance',
     deadlines: 'Échéances ARC · Revenu Québec', clients: 'Dossiers clients', aging: 'Classement chronologique',
-    ar: 'Clients', ap: 'Fournisseurs', chase: 'Honoraires à relancer', recon: 'Conciliation bancaire', autoMatch: 'Rapprochement auto',
+    ar: 'Clients', ap: 'Fournisseurs', chase: 'Honoraires impayés', recon: 'Conciliation bancaire', autoMatch: 'Rapprochement auto',
     tabs: { all: 'Tous', action: 'À traiter', progress: 'En cours', done: 'Terminés' },
     status: { action: 'À traiter', progress: 'En cours', done: 'Terminé' },
     closeTitle: (m) => `Clôture de ${m}`, ofDone: (a, b) => `${a} sur ${b}`, filedCount: (a, b) => `${a}/${b} produites`,
