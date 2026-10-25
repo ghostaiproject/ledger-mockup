@@ -10,6 +10,7 @@ const Bind = (() => {
     aje: () => state.firm.ye.aje,
     chase: () => state.chase,
     mine: () => state.cal.mine,
+    myclients: () => state.myClients, // clients-add.js
   };
   // single records (col 'one'): [get, set]
   const ONES = {

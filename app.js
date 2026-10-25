@@ -195,6 +195,7 @@ const CLIENTS = [
 ];
 
 const state = {
+  myClients: [], // added by hand (clients-add.js)
   lang: 'fr',
   theme: 'light',
   route: 'home',
@@ -509,7 +510,9 @@ function renderAuto() {
 
 function render() {
   const focus = focusedKey();
+  ClientsAdd.sync();
   renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderFirm(); renderTour();
+  ClientsAdd.after();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
   Bind.flush(); // save what changed

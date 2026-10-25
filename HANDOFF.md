@@ -1,6 +1,11 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Android keystore plugin + CI)
+## LATEST (2026-10-25, app icon + add clients by hand)
+- Icon: /ceig (Gemini) walnut F with mint page edge + ledger lines on charcoal, `src-tauri/app-icon.png` → `npx tauri icon` regenerated `src-tauri/icons/*` (incl. android).
+- Clients screen: "Ajouter un client" form (`clients-add.js`, loaded before app.js; `ClientsAdd.sync()/after()` called from `render()`). Own clients live in `state.myClients`, saved as collection `myclients` (Bind LISTS), merged into `CLIENTS`; remove button + undo toast. Only clients; engagements/deadlines/autopilot still have no manual add (follow-up).
+- Checked in browser (add + remove) and `npm run check` ALL OK. Not yet tested: add client then restart in the Tauri app.
+
+## Before (2026-10-25, Android keystore plugin + CI)
 - `src-tauri/plugins/keystore/` (Rust + Kotlin): Keystore HMAC-SHA256 key, per-use auth via BiometricPrompt + CryptoObject (fingerprint/face/PIN, minSdk 30). Same `secret(name, challenge)` contract as Hello; `device.rs` kind = "keystore" on Android. Registered in lib.rs under `cfg(target_os = "android")`.
 - UI: on keystore the "Windows Hello" strings become "phone lock" (`dev()` in vault-ui.js); locks after 30 s in the background (`bg` reason).
 - CI: `.github/workflows/app.yml` = Windows (tests + unsigned msi/nsis) + Android (`tauri android init` + debug apk) artifacts. Kotlin/Android NOT compiled locally: first CI run is the real test; fix from its log. Not tried on a phone.
