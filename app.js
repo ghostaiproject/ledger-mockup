@@ -2,12 +2,13 @@
 const T = {
   fr: {
     home: 'Accueil Solva', language: 'Langue', sections: 'Sections', dark: 'Mode sombre', light: 'Mode clair',
-    nav: { today: "Aujourd'hui", deadlines: 'Échéances', clients: 'Clients', money: 'Argent', close: 'Fin de mois' },
+    nav: { today: "Aujourd'hui", auto: 'Pilote auto', deadlines: 'Échéances', clients: 'Clients', money: 'Argent', close: 'Fin de mois' },
     kicker: 'Pour les cabinets comptables du Québec',
     landTitle: 'Ta journée de comptable, en toute simplicité.',
     landLead: "Solva te montre quoi faire aujourd'hui : les échéances à respecter, les clients à relancer, la fin de mois à boucler. Rien de plus.",
     open: 'Voir ma journée', how: 'Comment ça marche',
     benefits: [
+      ['wand-sparkles', 'Le pilote auto fait la tenue de livres', 'Tu donnes le relevé et les factures. Solva classe, relie, calcule les taxes et prépare les fichiers.'],
       ['calendar-clock', 'Les échéances, sans stress', "ARC et Revenu Québec : Solva te rappelle chaque date, au bon moment."],
       ['users', "Tes clients, d'un coup d'œil", 'Qui doit envoyer des documents, qui est prêt. En mots simples, pas en tableaux.'],
       ['list-checks', 'La fin de mois, pas à pas', 'Une liste à cocher. Une étape à la fois.'],
@@ -30,6 +31,7 @@ const T = {
     pct: (n) => `${n} % fait`, ask: 'Demander les documents', asked: 'Demande envoyée', ready: 'Marquer comme prêt', allReady: 'Dossier prêt. Rien à faire.',
     remind: (c) => `Envoyer un rappel à ${c}`, reminded: 'Rappel envoyé', unpaid: (d) => `impayée depuis ${d} jours`,
     tasks: {
+      auto: ['Pilote auto', 'Faire les livres du mois', (c) => `${c} · dépose le relevé et les factures, Solva fait le reste.`, 'Ouvrir le pilote auto'],
       payroll: ['Fait', 'Inscrire les paies de la semaine', () => 'Fait ce matin, 7 employés', ''],
       late: ['En retard', 'Produire la TPS/TVQ de Café Mistral', (d) => `Taxes de vente du mois dernier · ${d} jours de retard`, "C'est fait"],
       remind: ['À relancer', 'Relancer Transports Nordet', (a) => `Facture H-2291 · ${a} impayée depuis 47 jours`, 'Envoyer un rappel'],
@@ -38,15 +40,61 @@ const T = {
     toastFiled: 'Marqué comme produit', toastRemind: (c) => `Rappel envoyé à ${c}`, toastMatch: (n, r) => `${n} opérations reliées · ${r} à vérifier`,
     toastMatched: 'Banque à jour', toastAsk: (c) => `Demande envoyée à ${c}`, toastReady: (c) => `${c} est prêt`, toastClose: 'Fin de mois bouclée. Bravo !',
     undo: 'Annuler', undone: 'Annulé',
+    allDeadlines: 'Toutes les échéances',
+    autoTitle: 'Pilote automatique',
+    autoLead: 'Donne-moi le relevé bancaire et la liste des factures. Je m’occupe de la tenue de livres; tu vérifies seulement ce que je te montre.',
+    auto: {
+      whose: 'Les livres de qui ?', drop: 'Dépose tes fichiers ici',
+      dropHint: 'Relevé bancaire et factures en CSV (dans Excel : Enregistrer sous → CSV). Rien ne quitte ton appareil.',
+      pick: 'Choisir des fichiers', sample: 'Essayer avec des fichiers exemples',
+      kinds: { bank: 'Relevé bancaire', invoices: 'Factures', unknown: 'Pas reconnu' }, rows: (n) => `${n} ligne${n > 1 ? 's' : ''}`,
+      nobank: 'Il me faut au moins un relevé bancaire : colonnes Date, Description et Montant (ou Retrait et Dépôt).',
+      steps: { read: 'Je lis les fichiers', sort: 'Je classe les dépenses', match: 'Je relie les paiements aux factures', tax: 'Je calcule la TPS et la TVQ', journal: 'Je prépare les écritures', check: 'Je vérifie les résultats' },
+      need: (n) => (n ? `chose${n > 1 ? 's' : ''} à vérifier` : 'Les livres sont prêts.'),
+      did: (n) => `${n} opérations traitées pour toi`,
+      profit: (p) => (p < 0 ? 'Perte nette du mois' : 'Bénéfice net du mois'), taxes: (n) => (n < 0 ? 'Remboursement de taxes' : 'Taxes à remettre'),
+      by: (d) => `avant le ${d}`, matched: 'Paiements reliés',
+      checkH: 'À vérifier', didH: "Ce que j'ai fait", pnlH: 'Résultats', taxH: 'TPS et TVQ', owedH: "Qui doit encore de l'argent", filesH: 'Fichiers prêts',
+      log: {
+        read: (r) => `${r.bank.length} opérations bancaires et ${r.invoices} factures lues`,
+        sort: (r) => `${r.sorted.auto} dépenses sur ${r.sorted.outs} classées toutes seules`,
+        match: (r) => `${r.matched.deps} dépôts sur ${r.matched.of} reliés à leur facture · ${r.matched.paid} factures payées`,
+        tax: (r) => `TPS nette ${cents(r.taxes.gstNet)} · TVQ nette ${cents(r.taxes.qstNet)}`,
+        journal: (r) => `${r.journal.length} écritures · débits = crédits (${cents(r.totals.dr)})`,
+        check: (r) => (!r.balance ? 'Pas de colonne Solde : vérification du solde sautée'
+          : r.balance.ok ? `Solde bancaire vérifié : ${cents(r.balance.opening)} → ${cents(r.balance.closing)}` : 'Le solde ne suit pas : une ligne manque peut-être'),
+      },
+      tag: { duplicate: 'Deux fois ?', outlier: 'Montant inhabituel', deposit: 'Dépôt', partial: 'Paiement partiel', gap: 'Ligne manquante', unknown: 'Nouveau fournisseur' },
+      rv: {
+        duplicate: [(x) => `Même montant, même fournisseur, déjà payé le ${day(x.twin)}. Facturé deux fois ?`, [['Oui, deux fois', { account: 1250 }], ['Non, les deux sont bons', { ok: true }]]],
+        outlier: [(x) => `${x.times} fois plus que d'habitude pour ce compte. Un achat d'équipement ?`, [["C'est de l'équipement", { account: 1500 }], ['Le montant est bon', { ok: true }]]],
+        deposit: [() => "Un dépôt sans facture. C'est quoi ?", [['Une vente', { account: 4000 }], ["L'argent du propriétaire", { account: 2700 }]]],
+        partial: [(x) => `Paiement partiel de la facture ${x.inv} (${cents(x.total)}). Il reste ${cents(x.left)} à recevoir.`, [['Compris', { ok: true }]]],
+        gap: [(x) => `Le solde saute de ${cents(x.amount)} entre le ${day(x.after)} et le ${day(x.before)} : une ligne manque peut-être au relevé.`, [['Compris', { ok: true }]]],
+        unknown: [() => 'Je ne connais pas ce fournisseur. Choisis le compte, je vais m’en souvenir.', []],
+      },
+      account: 'Compte', save: 'Enregistrer',
+      pnl: { revenue: 'Revenus', spent: 'Dépenses' },
+      tax: { sales: 'Ventes avant taxes · ligne 101', gst: 'TPS perçue · 103', itc: 'CTI · 106', gstNet: 'TPS nette · 109', qst: 'TVQ perçue · 203', itr: 'RTI · 206', qstNet: 'TVQ nette · 209' },
+      notDue: 'pas encore due',
+      dl: { journal: 'Écritures de journal', bank: 'Banque classée', taxes: 'Déclaration TPS/TVQ', trial: 'Balance de vérification' },
+      copy: 'Copier le résumé pour le client', again: "Recommencer avec d'autres fichiers",
+      summary: (c, p, r) => `Bonjour ${c},\n\nVoici ${p} : revenus ${money(r.pnl.revenue)}, dépenses ${money(r.pnl.spent)}, ${r.pnl.profit < 0 ? 'perte nette' : 'bénéfice net'} de ${money(Math.abs(r.pnl.profit))}.\n`
+        + `TPS/TVQ ${r.taxes.net < 0 ? 'à recevoir' : 'à remettre'} : ${cents(Math.abs(r.taxes.net))}, avant le ${day(r.taxes.due)}.\nVos clients vous doivent encore ${money(owedTotal(r))}.\n\nBonne journée !`,
+      toastDone: (n) => (n ? `Fait. ${n} chose${n > 1 ? 's' : ''} à vérifier` : 'Fait. Les livres sont prêts'),
+      toastSaved: 'Enregistré', toastLearned: (v) => `Retenu pour la prochaine fois : ${v}`, toastCopied: 'Résumé copié', toastNoCopy: 'Sélectionne le texte pour le copier',
+      note: (n) => (n ? `Pilote auto : ${n} à vérifier` : 'Livres faits par le pilote auto'),
+    },
   },
   en: {
     home: 'Solva home', language: 'Language', sections: 'Sections', dark: 'Dark mode', light: 'Light mode',
-    nav: { today: 'Today', deadlines: 'Deadlines', clients: 'Clients', money: 'Money', close: 'Month-end' },
+    nav: { today: 'Today', auto: 'Autopilot', deadlines: 'Deadlines', clients: 'Clients', money: 'Money', close: 'Month-end' },
     kicker: 'For Québec accounting firms',
     landTitle: 'Your accounting day, made simple.',
     landLead: 'Solva tells you what to do today: deadlines to meet, clients to follow up, the month to close. Nothing more.',
     open: 'See my day', how: 'How it works',
     benefits: [
+      ['wand-sparkles', 'Autopilot does the bookkeeping', 'Give it the bank statement and the invoices. Solva sorts, matches, works out the taxes and makes the files.'],
       ['calendar-clock', 'Deadlines, without the stress', 'CRA and Revenu Québec: Solva reminds you of every date, right on time.'],
       ['users', 'Your clients at a glance', 'Who owes you documents, who is ready. In plain words, not spreadsheets.'],
       ['list-checks', 'Month-end, step by step', 'One checklist. One step at a time.'],
@@ -69,6 +117,7 @@ const T = {
     pct: (n) => `${n}% done`, ask: 'Ask for documents', asked: 'Request sent', ready: 'Mark as ready', allReady: 'File ready. Nothing to do.',
     remind: (c) => `Send a reminder to ${c}`, reminded: 'Reminder sent', unpaid: (d) => `unpaid for ${d} days`,
     tasks: {
+      auto: ['Autopilot', "Do this month's books", (c) => `${c} · drop the statement and invoices, Solva does the rest.`, 'Open Autopilot'],
       payroll: ['Done', "Record this week's payroll", () => 'Done this morning, 7 employees', ''],
       late: ['Late', 'File the GST/QST for Café Mistral', (d) => `Last month's sales tax · ${d} days late`, 'Mark as filed'],
       remind: ['Follow up', 'Follow up with Transports Nordet', (a) => `Invoice H-2291 · ${a} unpaid for 47 days`, 'Send a reminder'],
@@ -77,6 +126,51 @@ const T = {
     toastFiled: 'Marked as filed', toastRemind: (c) => `Reminder sent to ${c}`, toastMatch: (n, r) => `${n} matched · ${r} to check`,
     toastMatched: 'Bank up to date', toastAsk: (c) => `Request sent to ${c}`, toastReady: (c) => `${c} is ready`, toastClose: 'Month closed. Well done!',
     undo: 'Undo', undone: 'Undone',
+    allDeadlines: 'All deadlines',
+    autoTitle: 'Autopilot',
+    autoLead: 'Give me the bank statement and the invoice list. I do the bookkeeping; you only check what I show you.',
+    auto: {
+      whose: 'Whose books?', drop: 'Drop your files here',
+      dropHint: 'Bank statement and invoices as CSV (in Excel: Save as → CSV). Nothing leaves your device.',
+      pick: 'Choose files', sample: 'Try with sample files',
+      kinds: { bank: 'Bank statement', invoices: 'Invoices', unknown: 'Not recognized' }, rows: (n) => `${n} line${n > 1 ? 's' : ''}`,
+      nobank: 'I need at least one bank statement: columns Date, Description and Amount (or Withdrawal and Deposit).',
+      steps: { read: 'Reading the files', sort: 'Sorting the expenses', match: 'Matching payments to invoices', tax: 'Working out GST and QST', journal: 'Writing the journal entries', check: 'Checking the results' },
+      need: (n) => (n ? `thing${n > 1 ? 's' : ''} to check` : 'The books are ready.'),
+      did: (n) => `${n} transactions done for you`,
+      profit: (p) => (p < 0 ? 'Net loss this month' : 'Net profit this month'), taxes: (n) => (n < 0 ? 'Sales tax refund' : 'Sales tax to pay'),
+      by: (d) => `by ${d}`, matched: 'Payments matched',
+      checkH: 'Please check', didH: 'What I did', pnlH: 'Profit and loss', taxH: 'GST and QST', owedH: 'Who still owes money', filesH: 'Ready files',
+      log: {
+        read: (r) => `Read ${r.bank.length} bank transactions and ${r.invoices} invoices`,
+        sort: (r) => `Sorted ${r.sorted.auto} of ${r.sorted.outs} expenses on my own`,
+        match: (r) => `Linked ${r.matched.deps} of ${r.matched.of} deposits to their invoice · ${r.matched.paid} invoices paid`,
+        tax: (r) => `Net GST ${cents(r.taxes.gstNet)} · net QST ${cents(r.taxes.qstNet)}`,
+        journal: (r) => `${r.journal.length} journal entries · debits = credits (${cents(r.totals.dr)})`,
+        check: (r) => (!r.balance ? 'No Balance column: balance check skipped'
+          : r.balance.ok ? `Bank balance checks out: ${cents(r.balance.opening)} → ${cents(r.balance.closing)}` : 'The balance does not add up: a line may be missing'),
+      },
+      tag: { duplicate: 'Twice?', outlier: 'Unusual amount', deposit: 'Deposit', partial: 'Part payment', gap: 'Missing line', unknown: 'New vendor' },
+      rv: {
+        duplicate: [(x) => `Same amount, same vendor, already paid on ${day(x.twin)}. Charged twice?`, [['Yes, twice', { account: 1250 }], ['No, both are real', { ok: true }]]],
+        outlier: [(x) => `${x.times} times the usual for this account. An equipment purchase?`, [["It's equipment", { account: 1500 }], ['The amount is right', { ok: true }]]],
+        deposit: [() => 'A deposit with no invoice. What is it?', [['A sale', { account: 4000 }], ["The owner's money", { account: 2700 }]]],
+        partial: [(x) => `Part payment of invoice ${x.inv} (${cents(x.total)}). ${cents(x.left)} still to collect.`, [['Got it', { ok: true }]]],
+        gap: [(x) => `The balance jumps by ${cents(x.amount)} between ${day(x.after)} and ${day(x.before)}: a line may be missing from the statement.`, [['Got it', { ok: true }]]],
+        unknown: [() => "I don't know this vendor. Pick the account and I'll remember it.", []],
+      },
+      account: 'Account', save: 'Save',
+      pnl: { revenue: 'Revenue', spent: 'Expenses' },
+      tax: { sales: 'Sales before tax · line 101', gst: 'GST collected · 103', itc: 'ITCs · 106', gstNet: 'Net GST · 109', qst: 'QST collected · 203', itr: 'ITRs · 206', qstNet: 'Net QST · 209' },
+      notDue: 'not due yet',
+      dl: { journal: 'Journal entries', bank: 'Sorted bank', taxes: 'GST/QST return', trial: 'Trial balance' },
+      copy: 'Copy the summary for the client', again: 'Start over with other files',
+      summary: (c, p, r) => `Hello ${c},\n\nHere is ${p}: revenue ${money(r.pnl.revenue)}, expenses ${money(r.pnl.spent)}, ${r.pnl.profit < 0 ? 'a loss' : 'a profit'} of ${money(Math.abs(r.pnl.profit))}.\n`
+        + `GST/QST ${r.taxes.net < 0 ? 'to get back' : 'to pay'}: ${cents(Math.abs(r.taxes.net))}, by ${day(r.taxes.due)}.\nYour customers still owe you ${money(owedTotal(r))}.\n\nHave a good day!`,
+      toastDone: (n) => (n ? `Done. ${n} thing${n > 1 ? 's' : ''} to check` : 'Done. The books are ready'),
+      toastSaved: 'Saved', toastLearned: (v) => `Remembered for next time: ${v}`, toastCopied: 'Summary copied', toastNoCopy: 'Select the text to copy it',
+      note: (n) => (n ? `Autopilot: ${n} to check` : 'Books done by Autopilot'),
+    },
   },
 };
 
@@ -105,6 +199,7 @@ const state = {
     { id: 'h2330', client: 'Atelier Boréal', no: 'H-2330', amount: 980, days: 8, sent: false },
   ],
   bank: { total: 353, matched: 299, review: 10 },
+  auto: { client: 'boreal', files: [], result: null, busy: false, step: -1, decisions: {}, memory: {}, before: null, open: [] },
   checks: [
     { fr: 'Relevés bancaires reçus', en: 'Bank statements received', on: true },
     { fr: 'Banque reliée', en: 'Bank matched', auto: true },
@@ -119,6 +214,7 @@ try { // per-viewer conveniences only
   const saved = JSON.parse(localStorage.getItem('solva-v2') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
+  state.auto.memory = JSON.parse(localStorage.getItem('solva-memory') || '{}'); // vendors you taught Autopilot
 } catch (e) { /* storage blocked: defaults are fine */ }
 function save() { try { localStorage.setItem('solva-v2', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
@@ -126,6 +222,9 @@ const $ = (s) => document.querySelector(s);
 const t = () => T[state.lang];
 const loc = () => (state.lang === 'fr' ? 'fr-CA' : 'en-CA');
 const money = (n) => new Intl.NumberFormat(loc(), { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
+const cents = (n) => new Intl.NumberFormat(loc(), { style: 'currency', currency: 'CAD' }).format(n);
+const day = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString(loc(), { day: 'numeric', month: 'long' });
+const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); // file contents go into HTML
 const SVG = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
   + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
 function icons() { // swap <i data-lucide> for inline SVG from assets/icons.js: no CDN, nothing pops in late
@@ -135,7 +234,7 @@ function icons() { // swap <i data-lucide> for inline SVG from assets/icons.js: 
   });
 }
 // controls are rebuilt on every render; these data-* keys find the same control again so focus never drops to <body>
-const FOCUS_KEYS = ['lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task'];
+const FOCUS_KEYS = ['lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task', 'client', 'dl', 'copy', 'pick', 'sample'];
 function focusedKey() {
   const el = document.activeElement;
   const k = el && el.dataset && FOCUS_KEYS.find((key) => key in el.dataset);
@@ -184,6 +283,7 @@ const unmatched = () => state.bank.total - state.bank.matched;
 const checkOn = (c) => (c.auto ? unmatched() === 0 : c.on);
 const closeDone = () => state.checks.filter(checkOn).length;
 const TASKS = [
+  { id: 'auto', done: () => !!state.auto.result?.ok && !state.auto.result.review.length, arg: () => CLIENTS.find((c) => c.id === state.auto.client).name, tone: '' },
   { id: 'payroll', done: () => true, arg: () => '', tone: '' }, // already done this morning, so the ring never starts empty
   { id: 'late', done: () => state.filed.has('late'), arg: () => -daysTo(DEADLINES.find((d) => d.id === 'late').due), tone: 'red' },
   { id: 'remind', done: () => state.chase[0].sent, arg: () => money(4850), tone: 'amber' },
@@ -206,8 +306,8 @@ function renderShell() {
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
-  const NAV = { today: 'sun', deadlines: 'calendar-clock', clients: 'users', money: 'wallet', close: 'list-checks' };
-  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `<a href="#/${id}" ${state.route === id ? 'aria-current="page"' : ''}>
+  const NAV = { today: 'sun', auto: 'wand-sparkles', deadlines: 'calendar-clock', clients: 'users', money: 'wallet', close: 'list-checks' };
+  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `<a href="#/${id}" ${id === 'deadlines' ? 'class="wide-only"' : ''} ${state.route === id ? 'aria-current="page"' : ''}>
     <i data-lucide="${ic}"></i><span>${t().nav[id]}</span></a>`).join('');
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.dataset.screen === state.route));
 }
@@ -232,7 +332,7 @@ function renderToday() {
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
       <button class="btn ${done ? '' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
-        <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' ? 'wand-sparkles' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
+        <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }
 
@@ -311,9 +411,63 @@ function renderClose() {
       ${c.auto ? `<small>${unmatched() ? t().bankLine(unmatched()) : t().bankLine(0)}</small>` : ''}</span></button></li>`).join('');
 }
 
+/* ---------- autopilot screen ---------- */
+const STEPS = ['read', 'sort', 'match', 'tax', 'journal', 'check'];
+const owedTotal = (r) => r.owed.reduce((s, o) => s + o.left, 0);
+const acctName = (a) => SolvaEngine.ACCOUNTS[a][state.lang === 'en' ? 1 : 0];
+const periodName = (p) => new Date(+p.slice(0, 4), +p.slice(5, 7) - 1, 1).toLocaleDateString(loc(), { month: 'long', year: 'numeric' });
+const kv = (k, v, cls = '') => `<li class="${cls}"><span>${k}</span><b class="num">${v}</b></li>`;
+const more = (id, title, body) => `<details class="card more" data-more="${id}" ${state.auto.open.includes(id) ? 'open' : ''}><summary>${title}</summary>${body}</details>`;
+function reviewCard(x) {
+  const A = t().auto, [text, opts] = A.rv[x.type];
+  const head = x.tx ? `<b>${esc(x.tx.desc)}</b><small>${day(x.tx.date)} · <span class="num">${cents(x.tx.amount)}</span></small>` : '';
+  const acts = x.type === 'unknown'
+    ? `<div class="pick"><label class="field"><span>${A.account}</span><select id="acct-${esc(x.id)}">${[...Object.keys(SolvaEngine.ACCOUNTS).filter((a) => a >= 5000), '1500']
+      .map((a) => `<option value="${a}">${a} · ${acctName(a)}</option>`).join('')}</select></label>
+      <button class="btn primary" data-decide="${esc(x.id)}">${A.save}</button></div>`
+    : `<div class="acts">${opts.map(([label], i) => `<button class="btn ${i ? 'soft' : 'primary'}" data-decide="${esc(x.id)}" data-opt="${i}">${label}</button>`).join('')}</div>`;
+  return `<li class="card review"><span class="pill ${['partial', 'gap'].includes(x.type) ? '' : 'amber'}">${A.tag[x.type]}</span>${head}<p>${text(x)}</p>${acts}</li>`;
+}
+function renderAuto() {
+  const a = state.auto, A = t().auto, r = a.result;
+  const files = r ? r.files : a.files.map((f) => ({ name: f.name }));
+  const chips = files.map((f) => `<li><i data-lucide="file-up"></i><span>${esc(f.name)}</span>${f.kind
+    ? `<small class="pill ${f.kind === 'unknown' ? 'amber' : ''}">${A.kinds[f.kind]}${f.kind === 'unknown' ? '' : ' · ' + A.rows(f.rows)}</small>` : ''}</li>`).join('');
+  $('#autoFeed').innerHTML = a.busy
+    ? `<div class="card"><ul class="steps" aria-live="polite">${STEPS.map((s, i) => `<li class="${i < a.step ? 'done' : i === a.step ? 'on' : ''}"><span class="box"><i data-lucide="check"></i></span>${A.steps[s]}</li>`).join('')}</ul></div>`
+    : r && r.ok ? '' : `<div class="card feed">
+      <label class="field"><span>${A.whose}</span><select id="autoClient" data-client="1">${CLIENTS.map((c) => `<option value="${c.id}" ${c.id === a.client ? 'selected' : ''}>${c.name}</option>`).join('')}</select></label>
+      <button class="drop" id="drop" data-pick="1"><i data-lucide="file-up"></i><b>${A.drop}</b><small>${A.dropHint}</small><span class="btn primary">${A.pick}</span></button>
+      ${chips ? `<ul class="chips">${chips}</ul>` : ''}
+      ${r && r.error ? `<p class="warn"><i data-lucide="triangle-alert"></i>${A.nobank}</p>` : ''}
+      <button class="btn soft block" data-sample="1"><i data-lucide="sparkles"></i>${A.sample}</button></div>`;
+  if (a.busy || !r || !r.ok) { $('#autoOut').innerHTML = ''; return; }
+  const n = r.review.length, client = CLIENTS.find((c) => c.id === a.client).name, tx = r.taxes;
+  $('#autoOut').innerHTML = `
+    <div class="card answer" id="autoAnswer" tabindex="-1">
+      <div><b class="huge num">${n || '✓'}</b><p>${A.need(n)}</p><small class="muted">${client} · ${periodName(r.period)} · ${A.did(r.bank.length + r.invoices)}</small></div></div>
+    <ul class="stats">
+      <li class="card"><small>${A.profit(r.pnl.profit)}</small><b class="num">${money(Math.abs(r.pnl.profit))}</b></li>
+      <li class="card"><small>${A.taxes(tx.net)}</small><b class="num">${money(Math.abs(tx.net))}</b><small>${A.by(day(tx.due))}</small></li>
+      <li class="card"><small>${A.matched}</small><b class="num">${r.matched.deps} / ${r.matched.of}</b></li>
+    </ul>
+    ${n ? `<h2>${A.checkH}</h2><ul class="reviews">${r.review.map(reviewCard).join('')}</ul>` : ''}
+    ${more('did', A.didH, `<ul class="did">${STEPS.map((s) => `<li><i data-lucide="circle-check"></i><span>${A.log[s](r)}</span></li>`).join('')}</ul>`)}
+    ${more('pnl', `${A.pnlH}<span class="num">${money(r.pnl.profit)}</span>`, `<ul class="kv">${kv(A.pnl.revenue, cents(r.pnl.revenue))}
+      ${r.pnl.expenses.map((e) => kv(acctName(e.acct), cents(-e.amount), 'sub')).join('')}${kv(A.profit(r.pnl.profit), cents(r.pnl.profit), 'total')}</ul>`)}
+    ${more('tax', `${A.taxH}<span class="num">${money(tx.net)}</span>`, `<ul class="kv">${['sales', 'gst', 'itc', 'gstNet', 'qst', 'itr', 'qstNet']
+      .map((k) => kv(A.tax[k], cents(tx[k]), k.endsWith('Net') ? 'total' : '')).join('')}<li class="sub"><span>${A.by(day(tx.due))}</span></li></ul>`)}
+    ${r.owed.length ? more('owed', `${A.owedH}<span class="num">${money(owedTotal(r))}</span>`, `<ul class="kv">${r.owed.map((o) => kv(`${esc(o.client)} · ${esc(o.no)}<small>${o.late ? t().late(o.late) : A.notDue}</small>`, cents(o.left), o.late > 30 ? 'late' : '')).join('')}</ul>`) : ''}
+    <h2>${A.filesH}</h2>
+    <div class="dl">${Object.keys(A.dl).map((k) => `<button class="btn soft" data-dl="${k}"><i data-lucide="download"></i>${A.dl[k]}</button>`).join('')}</div>
+    <div class="card summary"><p class="pre" id="sumText">${esc(A.summary(client, periodName(r.period), r))}</p>
+      <button class="btn primary block" data-copy="1"><i data-lucide="copy"></i>${A.copy}</button></div>
+    <button class="link again" data-reset="1"><i data-lucide="rotate-ccw"></i>${A.again}</button>`;
+}
+
 function render() {
   const focus = focusedKey();
-  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose();
+  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
 }
@@ -354,6 +508,90 @@ function match() {
   else { b.matched = b.total; toast(t().toastMatched, () => { b.matched = before; }); }
 }
 
+/* ---------- autopilot: the engine works in a background thread, the page only shows its output ---------- */
+let worker = null;
+try { worker = new Worker('engine.js'); } catch (e) { /* file:// or no workers: it runs in the page instead */ }
+function engine(input) {
+  if (!worker) return Promise.resolve(SolvaEngine.run(input));
+  return new Promise((done) => {
+    worker.onmessage = (e) => done(e.data);
+    worker.onerror = (e) => { e.preventDefault(); worker = null; done(SolvaEngine.run(input)); };
+    worker.postMessage(input);
+  });
+}
+const isoToday = () => [TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate()].map((x) => String(x).padStart(2, '0')).join('-');
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const input = () => ({ files: state.auto.files, memory: state.auto.memory, decisions: state.auto.decisions, asOf: isoToday() });
+function applyResult() { // the client file and the month-end list follow what Autopilot did
+  const a = state.auto, r = a.result, c = CLIENTS.find((x) => x.id === a.client);
+  if (!r || !r.ok) return;
+  if (!a.before) a.before = { id: c.id, status: c.status, close: c.close, note: c.note, checks: state.checks.map((k) => k.on) };
+  const n = r.review.length;
+  Object.assign(c, { status: n ? 'progress' : 'done', close: n ? 90 : 100, note: { fr: T.fr.auto.note(n), en: T.en.auto.note(n) } });
+  state.checks[3].on = true; state.checks[4].on = !n;
+}
+async function autopilot() {
+  const a = state.auto;
+  if (a.busy || !a.files.length) return;
+  a.busy = true; a.step = 0;
+  const out = engine(input());
+  if (!calm) for (; a.step < STEPS.length; a.step++) { render(); await new Promise((ok) => setTimeout(ok, 280)); } // show each step the engine ran
+  a.result = await out; a.busy = false;
+  applyResult(); render();
+  if (a.result.ok) { $('#autoAnswer').focus(); toast(t().auto.toastDone(a.result.review.length)); }
+}
+async function rerun() { state.auto.result = await engine(input()); applyResult(); render(); }
+async function addFiles(list) {
+  const picked = [...list].filter((f) => f.size < 5e6);
+  state.auto.files = state.auto.files.concat(await Promise.all(picked.map(async (f) => ({ name: f.name, text: await f.text() }))));
+  autopilot();
+}
+async function decide(id, opt) {
+  const a = state.auto, x = a.result.review.find((v) => v.id === id);
+  const prev = { decisions: { ...a.decisions }, memory: { ...a.memory } };
+  const d = x.type === 'unknown' ? { account: +document.getElementById('acct-' + id).value } : t().auto.rv[x.type][1][+opt][1];
+  a.decisions[id] = d;
+  if (x.type === 'unknown') { a.memory[x.tx.key] = d.account; saveMemory(); }
+  await rerun();
+  ($('#autoOut [data-decide]') || $('#autoAnswer')).focus();
+  toast(x.type === 'unknown' ? t().auto.toastLearned(`${x.tx.key} → ${acctName(d.account)}`) : t().auto.toastSaved,
+    () => { a.decisions = prev.decisions; a.memory = prev.memory; saveMemory(); rerun(); });
+}
+function saveMemory() { try { localStorage.setItem('solva-memory', JSON.stringify(state.auto.memory)); } catch (e) { /* ignore */ } }
+function download(kind) {
+  const r = state.auto.result, file = SolvaEngine.exportsFor(r, state.lang)[kind];
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([file], { type: 'text/csv;charset=utf-8' }));
+  link.download = `${state.auto.client}-${r.period}-${kind}.csv`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+function resetAuto() {
+  const a = state.auto, b = a.before;
+  if (b) { Object.assign(CLIENTS.find((x) => x.id === b.id), { status: b.status, close: b.close, note: b.note }); b.checks.forEach((on, i) => { state.checks[i].on = on; }); }
+  Object.assign(a, { files: [], result: null, decisions: {}, before: null, step: -1 });
+}
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'fileIn') { addFiles(e.target.files); e.target.value = ''; }
+  else if (e.target.id === 'autoClient') { state.auto.client = e.target.value; render(); }
+});
+document.addEventListener('toggle', (e) => { // keep <details> open across re-renders
+  const id = e.target.dataset && e.target.dataset.more;
+  if (!id) return;
+  const o = state.auto.open.filter((x) => x !== id);
+  state.auto.open = e.target.open ? o.concat(id) : o;
+}, true);
+['dragenter', 'dragover'].forEach((ev) => document.addEventListener(ev, (e) => {
+  if (state.route !== 'auto' || !e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault(); $('#drop')?.classList.add('over');
+}));
+document.addEventListener('dragleave', (e) => { if (!e.relatedTarget) $('#drop')?.classList.remove('over'); });
+document.addEventListener('drop', (e) => {
+  if (state.route !== 'auto') return;
+  e.preventDefault(); $('#drop')?.classList.remove('over');
+  if (e.dataTransfer.files.length && !state.auto.result?.ok) addFiles(e.dataTransfer.files);
+});
+
 document.addEventListener('click', (e) => {
   const b = e.target.closest('button');
   if (!b || b.id === 'toastUndo') return;
@@ -365,10 +603,17 @@ document.addEventListener('click', (e) => {
   else if (ds.open) state.open = state.open === ds.open ? null : ds.open;
   else if (ds.task) {
     if (b.getAttribute('aria-disabled') === 'true') return;
+    if (ds.task === 'auto') { location.hash = '#/auto'; return; }
     if (ds.task === 'late') fileDeadline('late');
     else if (ds.task === 'remind') sendReminder(state.chase[0]);
     else match();
   }
+  else if (ds.pick) { $('#fileIn').click(); return; }
+  else if (ds.sample) { state.auto.files = SolvaEngine.sample(isoToday()); autopilot(); return; }
+  else if (ds.decide) { decide(ds.decide, ds.opt); return; }
+  else if (ds.dl) { download(ds.dl); return; }
+  else if (ds.copy) { navigator.clipboard.writeText($('#sumText').textContent).then(() => toast(t().auto.toastCopied), () => toast(t().auto.toastNoCopy)); return; }
+  else if (ds.reset) resetAuto();
   else if (ds.file) fileDeadline(ds.file);
   else if (ds.chase) sendReminder(state.chase.find((x) => x.id === ds.chase));
   else if (ds.match) match();
@@ -408,7 +653,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------- router: #/today, #/clients… ; plain #anchors stay on the page ---------- */
-const ROUTES = ['home', 'today', 'deadlines', 'clients', 'money', 'close'];
+const ROUTES = ['home', 'today', 'auto', 'deadlines', 'clients', 'money', 'close'];
 function route(first) {
   const h = location.hash;
   if (h && !h.startsWith('#/')) return;

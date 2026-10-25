@@ -8,7 +8,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 NAMES = ('arrow-right calendar-clock check chevron-down circle-check landmark list-checks mail moon party-popper '
-         'send sprout sun users wallet wand-sparkles').split()
+         'send sprout sun users wallet wand-sparkles file-up download copy rotate-ccw sparkles triangle-alert').split()
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'icons.js'
 
 with sync_playwright() as p:

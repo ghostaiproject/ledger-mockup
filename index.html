@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=optional" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="preload" href="assets/icons.js" as="script">
+<link rel="preload" href="engine.js" as="script">
 <link rel="preload" href="app.js" as="script">
 <!-- screens are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
 <script>document.documentElement.classList.add('booting'); setTimeout(() => document.documentElement.classList.remove('booting'), 3000);</script>
@@ -73,6 +74,15 @@
         <div><b class="huge num" id="todayCount"></b><p id="todayLine"></p></div>
       </div>
       <ul class="tasks" id="tasks"></ul>
+      <a class="link" href="#/deadlines"><i data-lucide="calendar-clock"></i><span data-i18n="allDeadlines"></span></a>
+    </section>
+
+    <section class="screen" data-screen="auto">
+      <h1 tabindex="-1" data-i18n="autoTitle"></h1>
+      <p class="lead" data-i18n="autoLead"></p>
+      <div id="autoFeed"></div>
+      <div id="autoOut" class="auto-out"></div>
+      <input type="file" id="fileIn" accept=".csv,.tsv,.txt,text/csv" multiple hidden>
     </section>
 
     <section class="screen" data-screen="deadlines">
@@ -121,6 +131,7 @@
 <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button class="toast-undo" id="toastUndo" hidden></button></div>
 
 <script src="assets/icons.js"></script>
+<script src="engine.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
