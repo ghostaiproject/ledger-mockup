@@ -186,7 +186,7 @@ const CLIENTS = [
 
 const state = {
   lang: 'fr',
-  theme: 'dark',
+  theme: 'light',
   route: 'home',
   filter: 'action',
   open: null,
@@ -211,12 +211,12 @@ const state = {
   ],
 };
 try { // per-viewer conveniences only
-  const saved = JSON.parse(localStorage.getItem('solva-v2') || '{}');
+  const saved = JSON.parse(localStorage.getItem('solva-v3') || '{}');
   if (saved.lang in T) state.lang = saved.lang;
   if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
   state.auto.memory = JSON.parse(localStorage.getItem('solva-memory') || '{}'); // vendors you taught Autopilot
 } catch (e) { /* storage blocked: defaults are fine */ }
-function save() { try { localStorage.setItem('solva-v2', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
+function save() { try { localStorage.setItem('solva-v3', JSON.stringify({ lang: state.lang, theme: state.theme })); } catch (e) { /* ignore */ } }
 
 const $ = (s) => document.querySelector(s);
 const t = () => T[state.lang];
@@ -303,6 +303,7 @@ function renderShell() {
     b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1;
   });
   const dark = state.theme === 'dark';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#0e1110' : '#f7f9f8';
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
