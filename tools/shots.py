@@ -41,6 +41,7 @@ with sync_playwright() as p:
     desk.click('[data-lang="en"]')
     desk.click('[data-theme-set="night"]')
     desk.click('[data-tab="action"]')
+    desk.evaluate('scrollTo(0, 0)')
     desk.wait_for_timeout(900)
     night = desk.screenshot(path=OUT / 'desktop-night.png', full_page=True)
 
