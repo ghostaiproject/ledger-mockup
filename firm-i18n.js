@@ -32,6 +32,7 @@ const TF = {
       std: 'au taux standard', rate: (r) => `${r} $/h`,
     },
     ye: {
+      none: 'Aucun dossier de fin d’exercice pour l’instant. Il apparaîtra ici avec votre premier mandat de compilation.',
       title: 'Dossier de fin d’exercice', client: 'Érablière Deux-Pins inc.', period: 'Exercice clos le 30 juin 2026',
       views: { tb: 'Balance', aje: 'Écritures', lead: 'Feuilles sommaires', fs: 'États financiers' },
       cols: { acct: 'Compte', unadj: 'Non ajustée', adj: 'Ajust.', final: 'Ajustée', py: '2025', varc: 'Écart' },

@@ -301,7 +301,7 @@ const TASKS = [
   { id: 'auto', done: () => !!state.auto.result?.ok && !state.auto.result.review.length, arg: () => CLIENTS.find((c) => c.id === state.auto.client).name, tone: '' },
   { id: 'payroll', done: () => true, arg: () => '', tone: '' }, // already done this morning, so the ring never starts empty
   { id: 'late', done: () => state.filed.has('late'), arg: () => -daysTo(DEADLINES.find((d) => d.id === 'late').due), tone: 'red' },
-  { id: 'remind', done: () => state.chase[0].sent, arg: () => money(4850), tone: 'amber' },
+  { id: 'remind', done: () => !state.chase[0] || !!state.chase[0].sent, arg: () => money(4850), tone: 'amber' },
   { id: 'match', done: () => unmatched() <= state.bank.review, arg: () => unmatched(), tone: '' },
 ];
 TASKS.unshift(...firmTasks()); // the firm's own work comes first

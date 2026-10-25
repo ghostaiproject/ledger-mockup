@@ -90,7 +90,7 @@ rmSync(join(data, 'vault.local.json')); // as on a new device: only the passphra
 const c = await session(`(async () => ({ docs: (await Store.doc.list()).length, pbc: state.firm.pbc[2].st }))()`,
   { pre: `async () => { const s = await StoreNative.status(); await w('#vault form[data-form=unlock]');
   set('vp1', 'wrong passphrase!'); submit(); const wrong = await err(); set('vp1', '${PASS}'); submit(); return { s, wrong }; }` });
-ok(c.first.s.state === 'locked' && !c.first.s.deviceReady && /incorrecte/.test(c.first.wrong), `passphrase screen: wrong passphrase refused ${JSON.stringify(c.first)}`);
+ok(c.first.s.state === 'locked' && !c.first.s.deviceReady && /incorrecte/.test(c.first.wrong), 'passphrase screen: wrong passphrase refused');
 ok(c.docs === 1 && c.pbc === 'waived', 'passphrase opens the same data');
 ok(existsSync(join(data, 'vault.local.json')), 'passphrase unlock re-wraps the key for this device');
 
@@ -106,6 +106,7 @@ rmSync(data2, { recursive: true, force: true });
 const ROUTES = ['today', 'engagements', 'yearend', 'requests', 'time', 'more', 'auto', 'review', 'calendar', 'engine', 'deadlines', 'clients', 'money', 'close', 'home'];
 const walkRoutes = `(async () => { const errs = []; addEventListener('error', (e) => errs.push(String(e.error?.stack || e.message).slice(0, 400)));
   for (const r of ${JSON.stringify(ROUTES)}) { state.route = r; try { render(); } catch (x) { errs.push(r + ': ' + String(x.stack).slice(0, 300)); } await new Promise((x) => setTimeout(x, 100)); }
+  const boot = document.querySelector('main.vault-err'); if (boot) errs.unshift('boot: ' + boot.textContent);
   return { errs, n: state.firm.eng.length + state.firm.time.length + state.firm.pbc.length, start: await Store.get('one', 'start') }; })()`;
 const e = await session(walkRoutes, { dir: data2, pre: `async () => { await create('empty'); return {}; }` });
 ok(e.start === 'empty' && e.n === 0, 'empty firm: no sample engagements, hours or requests');

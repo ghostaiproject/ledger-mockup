@@ -1,7 +1,7 @@
 /* Lock / first-run screens (vault-ui.js), app only. Full screen above the app, one calm card. */
-.vault { position: fixed; inset: 0; z-index: 100; overflow-y: auto; display: grid; place-items: center;
+.vault { position: fixed; inset: 0; z-index: 100; overflow-y: auto; display: flex; /* card margin:auto centers, yet a tall form still scrolls from its top */
   padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); background: var(--bg); color: var(--ink); }
-.vault-card { width: min(440px, 100%); }
+.vault-card { width: min(440px, 100%); margin: auto; }
 .vault-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 40px; }
 .vault-top .brand { font-size: 22px; }
 .vault-top .seg { flex: 0 0 auto; }

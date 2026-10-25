@@ -31,6 +31,7 @@ TF.en = {
     std: 'at standard rates', rate: (r) => `$${r}/h`,
   },
   ye: {
+    none: 'No year-end file yet. It shows up here with your first compilation engagement.',
     title: 'Year-end file', client: 'Érablière Deux-Pins inc.', period: 'Year ended June 30, 2026',
     views: { tb: 'Trial balance', aje: 'Entries', lead: 'Lead sheets', fs: 'Financial statements' },
     cols: { acct: 'Account', unadj: 'Unadjusted', adj: 'Adj.', final: 'Adjusted', py: '2025', varc: 'Change' },

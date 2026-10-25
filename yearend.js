@@ -45,6 +45,7 @@ function yeBlockers(c) {
 
 function renderYearend() {
   const el = $('#yeOut'); if (!el) return;
+  if (!yeEng()) { el.innerHTML = `<div class="card empty"><i data-lucide="folder-open"></i><p>${tf().ye.none}</p></div>`; return; } // empty firm
   const Y = tf().ye, S = yeS(), c = yeCalc();
   const tabs = Object.entries(Y.views).map(([k, v]) => `<button role="radio" aria-checked="${S.view === k}" data-ye-view="${k}">${v}</button>`).join('');
   const ok = !c.diff;

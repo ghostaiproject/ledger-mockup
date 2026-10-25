@@ -1,6 +1,14 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Tauri app: step 4 vault keys)
+## LATEST (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
+- Rename: Solva → Folio everywhere (exe `folio.exe`, id `ca.folio.app`, env `FOLIO_DATA_DIR` / `FOLIO_DEVICE`). Storage keys kept (`solva-v3`, `solva-store-web`, `solva-idle-min`, `solva-lock`, HMAC label `solva-name`) so nothing needs migrating.
+- Screens: `vault-ui.js` + `vault-ui.css` + `vault-i18n.js` (FR/EN), app only (null on the web demo). First run = create (passphrase twice, min 10, strength meter, "keep it safe" warning, Hello note) → "Par où commencer?" (Cabinet vide / Charger l'exemple). Locked = Windows Hello button first (opens by itself at start, not after a lock) + "Utiliser ma phrase secrète"; no device copy = passphrase form ("Première ouverture sur cet appareil…"). Rust errors shown in FR/EN.
+- Lock: header lock button + auto-lock after 10 min idle (`localStorage solva-idle-min` overrides). Lock = save → `vault_lock` → page reload, so no decrypted data stays in memory. `.app` is `inert` under the lock screen.
+- Empty firm: record `one/start` = 'empty' clears the firm lists (engagements, hours, invoices, requests, AJEs, reminders, own calendar items) on every start. Clients, deadlines, autopilot bank sample and the Deux-Pins trial balance are still sample data in an empty firm (they need real empty states: follow-up). Fixed crashes: Today letter/reminder tasks, year-end screen (new empty state).
+- `interimUnlock()` prompts are gone: `StoreNative.open(start)` is the gate, `whenOpen()` shows the screens.
+- `tools/app_check.mjs` drives the real screens: 18 checks (create form errors, meter, sample, restart, passphrase form, re-wrap, idle lock wipes memory, empty firm on 15 routes, empty stays empty). Contact sheet of the 16 views (light/dark × phone/desktop): `shots/vault-sheet.jpg`. Hand test of the new screens with real Hello: NOT done yet.
+
+## Before (2026-10-25, Tauri app: step 4 vault keys)
 - Vault: random DEK wrapped twice: Windows Hello (`hello_win.rs`, sign → HKDF) in `vault.local.json` + Argon2id passphrase in `vault.json` (goes to the cloud in step 5). Dev key file gone (adopted as DEK on create). Release builds now open too.
 - Tauri: `vault_status` {state new|locked|open, device, deviceReady, minPass}, `vault_create(pass)`, `vault_unlock(pass?)` (none = Hello), `vault_lock`. JS: `StoreNative.vault.*`, `Store.ready()` waits for open.
 - Until the screens: `store-native.js` `interimUnlock()` uses Hello, else `prompt()` (create asks twice). Replace with lock/onboarding screens (Next 2, /crew) + idle auto-lock.
