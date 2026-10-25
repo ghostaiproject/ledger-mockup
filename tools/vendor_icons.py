@@ -10,7 +10,8 @@ from playwright.sync_api import sync_playwright
 NAMES = ('arrow-right calendar-clock check chevron-down circle-check landmark list-checks mail moon party-popper '
          'send sprout sun users wallet wand-sparkles file-up download copy rotate-ccw sparkles triangle-alert '
          'calendar-days chevron-left chevron-right shield-check sliders-horizontal pen-line circle-x circle-minus plus trash-2 '
-         'upload history scale info search calendar-plus file-check').split()
+         'upload history scale info search calendar-plus file-check '
+         'briefcase folder-open timer inbox printer file-text layout-grid receipt play square clock').split()
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'icons.js'
 
 with sync_playwright() as p:

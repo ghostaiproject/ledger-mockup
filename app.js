@@ -4,13 +4,13 @@ const T = {
     home: 'Accueil Solva', language: 'Langue', sections: 'Sections', dark: 'Mode sombre', light: 'Mode clair',
     nav: { today: "Aujourd'hui", calendar: 'Calendrier', clients: 'Clients', auto: 'Pilote auto', review: 'Révision', money: 'Argent', close: 'Fin de mois', engine: 'Moteur', deadlines: 'Échéances' },
     kicker: 'Pour les CPA et les cabinets comptables du Québec',
-    landTitle: 'Moins de saisie. Plus de révision.',
-    landLead: "Solva prépare les livres de tes clients, explique chaque décision et te laisse corriger, approuver et signer. Toutes les échéances ARC et Revenu Québec du portefeuille, dans un seul calendrier.",
+    landTitle: 'Du relevé bancaire aux états financiers signés.',
+    landLead: "Solva suit chaque mandat du cabinet : tenue de livres, missions de compilation et d’examen, T2/CO-17 et T1/TP-1. Le pilote auto prépare, le réviseur vérifie, l’associée signe. Temps, TEC et échéances ARC et Revenu Québec du portefeuille au même endroit.",
     open: 'Voir ma journée', how: 'Comment ça marche',
     benefits: [
       ['wand-sparkles', 'Le pilote auto prépare, tu révises', 'Relevé et factures en entrée : classement, rapprochement, TPS/TVQ, écritures. Seules les exceptions te reviennent.'],
       ['shield-check', 'Chaque décision a sa raison', 'Règle, fournisseur appris, facture reliée : tout est montré, corrigeable, approuvable par lot, puis signé par le préparateur et le réviseur.'],
-      ['sliders-horizontal', 'Le moteur, réglable et vérifiable', 'Taux, CTI par compte, seuils, règles de fournisseurs : tout se change, tout est noté, et dix contrôles se refont à la main.'],
+      ['briefcase', 'Chaque mandat, de la lettre à la remise', 'Lettre de mission, indépendance, documents du client, dossier de fin d’exercice, signatures, temps et TEC : tout le cabinet sur un écran.'],
       ['calendar-days', 'Un calendrier pour tout le portefeuille', 'TPS/TVQ, DAS, acomptes, T2/CO-17, T4/RL-1 : calculés selon le profil de chaque client, exportables vers ton agenda.'],
     ],
     peek: { cats: [['Hydro-Québec', 'Électricité'], ['Bell', 'Téléphone'], ['RONA', 'Matériel']], due: 'TPS/TVQ', dueSub: 'Café Mistral · dans 8 jours',
@@ -95,13 +95,13 @@ const T = {
     home: 'Solva home', language: 'Language', sections: 'Sections', dark: 'Dark mode', light: 'Light mode',
     nav: { today: 'Today', calendar: 'Calendar', clients: 'Clients', auto: 'Autopilot', review: 'Review', money: 'Money', close: 'Month-end', engine: 'Engine', deadlines: 'Deadlines' },
     kicker: 'For Québec CPAs and accounting firms',
-    landTitle: 'Less data entry. More review.',
-    landLead: 'Solva prepares your clients’ books, explains every decision and lets you fix, approve and sign off. Every CRA and Revenu Québec date for the whole client list, in one calendar.',
+    landTitle: 'From bank statement to signed financial statements.',
+    landLead: 'Solva runs every engagement in the firm: bookkeeping, compilation and review engagements, T2/CO-17 and T1/TP-1. Autopilot prepares, the reviewer checks, the partner signs. Time, WIP and every CRA and Revenu Québec date for the portfolio in one place.',
     open: 'See my day', how: 'How it works',
     benefits: [
       ['wand-sparkles', 'Autopilot prepares, you review', 'Statement and invoices in: sorting, matching, GST/QST, journal entries. Only the exceptions come back to you.'],
       ['shield-check', 'Every decision shows its reason', 'Rule, learned vendor, matched invoice: all shown, fixable, approvable in batches, then signed by preparer and reviewer.'],
-      ['sliders-horizontal', 'An engine you can set and check', 'Rates, ITC by account, thresholds, vendor rules: everything can change, everything is logged, and ten tie-outs can be redone by hand.'],
+      ['briefcase', 'Every engagement, from letter to issue', 'Engagement letter, independence, client documents, year-end file, sign-offs, time and WIP: the whole firm on one screen.'],
       ['calendar-days', 'One calendar for the whole client list', 'GST/QST, source deductions, instalments, T2/CO-17, T4/RL-1: worked out from each client profile, exportable to your calendar.'],
     ],
     peek: { cats: [['Hydro-Québec', 'Utilities'], ['Bell', 'Phone'], ['RONA', 'Supplies']], due: 'GST/QST', dueSub: 'Café Mistral · in 8 days',
@@ -244,7 +244,7 @@ function icons() { // swap <i data-lucide> for inline SVG from assets/icons.js: 
   });
 }
 // controls are rebuilt on every render; these data-* keys find the same control again so focus never drops to <body>
-const FOCUS_KEYS = ['lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task', 'client', 'dl', 'copy', 'pick', 'sample', 'rvRole', 'rvFilter', 'rvAll', 'rvMark', 'rvSel', 'rvAcct', 'rvSign', 'rvUnsign', 'rvWho', 'rvExplain', 'set', 'ruleRe', 'ruleAcct', 'ruleDel', 'mem', 'calNav', 'calKind', 'calDay', 'calDone', 'calClient', 'tour'];
+const FOCUS_KEYS = [...FIRM_FOCUS, 'lang', 'themeToggle', 'filter', 'file', 'open', 'ask', 'ready', 'chase', 'match', 'check', 'task', 'client', 'dl', 'copy', 'pick', 'sample', 'rvRole', 'rvFilter', 'rvAll', 'rvMark', 'rvSel', 'rvAcct', 'rvSign', 'rvUnsign', 'rvWho', 'rvExplain', 'set', 'ruleRe', 'ruleAcct', 'ruleDel', 'mem', 'calNav', 'calKind', 'calDay', 'calDone', 'calClient', 'tour'];
 function focusedKey() {
   const el = document.activeElement;
   const k = el && el.dataset && FOCUS_KEYS.find((key) => key in el.dataset);
@@ -286,6 +286,8 @@ const DEADLINES = [
   { id: 't4', fr: ["Relevés de fin d'année", 'T4 et RL-1 · 6 clients'], en: ['Year-end slips', 'T4 and RL-1 · 6 clients'], due: nextFeb28() },
 ].map((d) => ({ ...d, due: businessDay(d.due) })).sort((a, b) => a.due - b.due);
 Object.assign(state, deskInit()); // desk.js: settings, review, calendar
+Object.assign(state, firmInit()); // firm-data.js: engagements, time, requests, year-end file
+['fr', 'en'].forEach((l) => { Object.assign(T[l].nav, TF[l].nav); Object.assign(T[l].tasks, TF[l].tasks); });
 deskSeed();
 const daysTo = (d) => Math.round((d - TODAY) / DAY);
 const whenText = (days) => (days < 0 ? t().late(-days) : days === 0 ? t().today : t().inDays(days));
@@ -303,6 +305,7 @@ const TASKS = [
   { id: 'remind', done: () => state.chase[0].sent, arg: () => money(4850), tone: 'amber' },
   { id: 'match', done: () => unmatched() <= state.bank.review, arg: () => unmatched(), tone: '' },
 ];
+TASKS.unshift(...firmTasks()); // the firm's own work comes first
 
 /* ---------- render ---------- */
 function renderShell() {
@@ -322,8 +325,12 @@ function renderShell() {
   const tb = $('#themeBtn');
   tb.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
   tb.setAttribute('aria-label', dark ? t().light : t().dark);
-  const NAV = { today: 'sun', calendar: 'calendar-days', clients: 'users', auto: 'wand-sparkles', review: 'shield-check', money: 'wallet', close: 'list-checks', engine: 'sliders-horizontal' };
-  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `<a href="#/${id}" ${['money', 'close', 'engine'].includes(id) ? 'class="wide-only"' : ''} ${state.route === id || (id === 'calendar' && state.route === 'deadlines') ? 'aria-current="page"' : ''}>
+  // computer first: every section in the side bar; a phone keeps 4 + "More"
+  const NAV = { today: 'sun', engagements: 'briefcase', calendar: 'calendar-days', review: 'shield-check', yearend: 'folder-open', requests: 'inbox', time: 'timer', clients: 'users', auto: 'wand-sparkles', money: 'wallet', close: 'list-checks', engine: 'sliders-horizontal', more: 'layout-grid' };
+  const PHONE = ['today', 'engagements', 'calendar', 'review', 'more'];
+  const cur = (id) => state.route === id || (id === 'calendar' && state.route === 'deadlines');
+  const GROUP = { today: 0, yearend: 1, clients: 2 }; // side-bar headings on a computer
+  $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `${id in GROUP ? `<span class="nav-h wide-only" aria-hidden="true">${tf().navGroups[GROUP[id]]}</span>` : ''}<a href="#/${id}" class="${id === 'more' ? 'phone-only' : PHONE.includes(id) ? '' : 'wide-only'}" ${cur(id) ? 'aria-current="page"' : ''}>
     <i data-lucide="${ic}"></i><span>${t().nav[id]}</span></a>`).join('');
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.dataset.screen === state.route));
 }
@@ -360,7 +367,7 @@ function renderToday() {
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
       <button class="btn ${done ? '' : i ? 'soft' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
-        <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : x.id === 'review' ? 'shield-check' : x.id === 'week' ? 'calendar-days' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
+        <i data-lucide="${done ? 'circle-check' : x.icon || x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : x.id === 'review' ? 'shield-check' : x.id === 'week' ? 'calendar-days' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }
 
@@ -503,7 +510,7 @@ function renderAuto() {
 
 function render() {
   const focus = focusedKey();
-  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderTour();
+  renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderFirm(); renderTour();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
 }
@@ -640,6 +647,8 @@ document.addEventListener('click', (e) => {
   else if (ds.open) state.open = state.open === ds.open ? null : ds.open;
   else if (ds.task) {
     if (b.getAttribute('aria-disabled') === 'true') return;
+    const tk = TASKS.find((x) => x.id === ds.task);
+    if (tk && tk.go) { if (tk.open) state.firm.open = tk.open; location.hash = tk.go; return; }
     if (ds.task === 'auto') { location.hash = '#/auto'; return; }
     if (ds.task === 'review') { location.hash = '#/review'; return; }
     if (ds.task === 'week') { location.hash = '#/calendar'; return; }
@@ -692,7 +701,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------- router: #/today, #/clients… ; plain #anchors stay on the page ---------- */
-const ROUTES = ['home', 'today', 'auto', 'review', 'calendar', 'engine', 'deadlines', 'clients', 'money', 'close'];
+const ROUTES = ['home', 'today', 'engagements', 'yearend', 'requests', 'time', 'more', 'auto', 'review', 'calendar', 'engine', 'deadlines', 'clients', 'money', 'close'];
 function route(first) {
   const h = location.hash;
   if (h && !h.startsWith('#/')) return;

@@ -1,6 +1,14 @@
 # Solva (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, main a70240a, live)
+## LATEST (2026-10-25, public accounting + computer first)
+- Built for a CPA firm first. New screens: `#/engagements` (compilation NCSC 4200, review NCME 2400, T2/CO-17, T1/TP-1, bookkeeping; 7 stages with gates: letter, independence, client docs, year-end sign-offs), `#/yearend` (Deux-Pins at 2026-06-30: trial balance, 4 proposed AJEs incl. tax 12.2 %, lead sheets with variance flags, compiled statements + compilation report, preparer → reviewer → partner sign-off, print, CSV), `#/requests` (PBC list per engagement), `#/time` (timer, entries, budget vs actual, WIP, bill → invoice, CSV), `#/more` (phone index).
+- Code: `firm-data.js` (staff, engagements, time, PBC, TB), `firm-i18n.js` + `firm-i18n-en.js` (`tf()`), `firm.js` (engagements, requests, more, Today tasks), `firm-time.js`, `yearend.js`, `firm.css` (firm styles + computer-first layout: 1560px app, grouped side bar, dense rows).
+- Phone bar = Today, Engagements, Calendar, Review, More. Computer = every section in 3 groups.
+- Hero art: /ceig desk + laptop (light `hero.jpg`, dusk `hero-dark.jpg`); phone mockup hidden at ≥1080.
+- Deploy: `.github/workflows/pages.yml` stamps `?v=` with the commit on every push (phones never keep old files). Worker loads the versioned `engine.js`.
+- Firm state is not saved (resets on reload).
+
+## Before (2026-10-25, main a70240a)
 - Accountant workbench: `#/review` (method + reason + confidence per line, override, batch approve, 10 tie-outs, preparer/reviewer sign-off voided by later changes, audit CSV), `#/engine` (every engine setting, rule tester, change log, JSON export/import), `#/calendar` (deadlines from client `profile`, .ics). Code: `desk.js` + `desk.css`.
 - Sample button = 9-step guided tour (`tour.js`) doing the real actions end to end.
 - Palette: black/white + walnut brown (`--ring` #8a6244 / dark #c9a27e) + #DAF1DE; buttons ink with mint text. New /ceig hero art (desk, charcoal + walnut).

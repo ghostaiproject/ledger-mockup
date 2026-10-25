@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=optional" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=20261025b">
 <link rel="stylesheet" href="desk.css?v=20261025b">
+<link rel="stylesheet" href="firm.css?v=20261025b">
 <link rel="preload" href="assets/icons.js?v=20261025b" as="script">
 <link rel="preload" href="engine.js?v=20261025b" as="script">
 <link rel="preload" href="desk.js?v=20261025b" as="script">
@@ -47,8 +48,8 @@
           </div>
         </div>
         <div class="land-visual" aria-hidden="true">
-        <img class="land-art day" src="assets/hero.jpg" alt="" width="840" height="840">
-        <img class="land-art night" src="assets/hero-dark.jpg" alt="" width="840" height="840" loading="lazy">
+        <img class="land-art day" src="assets/hero.jpg" alt="" width="1024" height="1024">
+        <img class="land-art night" src="assets/hero-dark.jpg" alt="" width="1024" height="1024" loading="lazy">
         <div class="phone">
           <div class="phone-screen">
             <p class="ph-date" id="phDate"></p>
@@ -145,6 +146,36 @@
       </div>
       <ul class="checks" id="checks"></ul>
     </section>
+    <section class="screen" data-screen="engagements">
+      <h1 tabindex="-1" data-i18n-tf="eng.title"></h1>
+      <p class="lead" data-i18n-tf="eng.lead"></p>
+      <div class="seg wide" role="radiogroup" id="engFilter" data-i18n-label="sections"></div>
+      <ul class="list eng-list" id="engList"></ul>
+    </section>
+
+    <section class="screen wide-screen" data-screen="yearend">
+      <h1 tabindex="-1" data-i18n-tf="ye.title"></h1>
+      <div id="yeOut"></div>
+    </section>
+
+    <section class="screen" data-screen="requests">
+      <h1 tabindex="-1" data-i18n-tf="req.title"></h1>
+      <p class="lead" data-i18n-tf="req.lead"></p>
+      <div id="pbcOut" class="pbc-grid"></div>
+    </section>
+
+    <section class="screen wide-screen" data-screen="time">
+      <h1 tabindex="-1" data-i18n-tf="time.title"></h1>
+      <p class="lead" data-i18n-tf="time.lead"></p>
+      <div id="timeOut"></div>
+    </section>
+
+    <section class="screen" data-screen="more">
+      <h1 tabindex="-1" data-i18n-tf="more.title"></h1>
+      <p class="lead" data-i18n-tf="more.lead"></p>
+      <ul class="more-grid" id="moreOut"></ul>
+    </section>
+
   </main>
 </div>
 
@@ -153,6 +184,12 @@
 <script src="assets/icons.js?v=20261025b"></script>
 <script src="engine.js?v=20261025b"></script>
 <script src="desk.js?v=20261025b"></script>
+<script src="firm-data.js?v=20261025b"></script>
+<script src="firm-i18n.js?v=20261025b"></script>
+<script src="firm-i18n-en.js?v=20261025b"></script>
+<script src="firm.js?v=20261025b"></script>
+<script src="firm-time.js?v=20261025b"></script>
+<script src="yearend.js?v=20261025b"></script>
 <script src="tour.js?v=20261025b"></script>
 <script src="app.js?v=20261025b"></script>
 </body>
