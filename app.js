@@ -340,13 +340,15 @@ function renderToday() {
   $('#todayCount').textContent = left || '✓';
   $('#todayLine').textContent = t().leftToday(left);
   $('#ring').style.strokeDashoffset = 314.16 * (left / TASKS.length);
-  $('#tasks').innerHTML = [...TASKS].sort((a, b) => a.done() - b.done()).map((x) => {
+  // late first, done last; only the first open task gets the filled button (one primary per screen)
+  const rank = (x) => (x.done() ? 2 : x.tone === 'red' ? 0 : 1);
+  $('#tasks').innerHTML = [...TASKS].sort((a, b) => rank(a) - rank(b)).map((x, i) => {
     const [tag, title, desc, btn] = t().tasks[x.id];
     const done = x.done();
     return `<li class="card task ${done ? 'done' : ''}">
       <span class="pill ${done ? '' : x.tone}">${done ? t().done : tag}</span>
       <b>${title}</b><p>${desc(x.arg())}</p>
-      <button class="btn ${done ? '' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
+      <button class="btn ${done ? '' : i ? 'soft' : 'primary'} block" data-task="${x.id}" ${done ? 'aria-disabled="true"' : ''}>
         <i data-lucide="${done ? 'circle-check' : x.id === 'remind' ? 'mail' : x.id === 'match' || x.id === 'auto' ? 'wand-sparkles' : 'check'}"></i>${done ? t().done : btn}</button></li>`;
   }).join('');
 }

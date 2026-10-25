@@ -10,6 +10,7 @@
   --on-accent: #daf1de;
   --tint: #daf1de;
   --soft: #eef2ef;
+  --raised: #ffffff;
   --ring: #3f8a62;
   --red: #b23a2c;
   --red-tint: #f8e3df;
@@ -30,8 +31,9 @@
   --accent: #daf1de;
   --accent-ink: #daf1de;
   --on-accent: #0e1110;
-  --tint: #222926;
+  --tint: #26302a;
   --soft: #1d2220;
+  --raised: #2e3632;
   --ring: #9fd8b4;
   --red: #ff9a8a;
   --red-tint: #33191a;
@@ -76,7 +78,7 @@ svg.lucide { width: 22px; height: 22px; stroke-width: 2; flex: none; }
 
 .seg { display: flex; padding: 4px; border-radius: 16px; background: var(--soft); }
 .seg button { flex: 1; min-height: 44px; padding: 8px 14px; border-radius: 12px; font-weight: 600; color: var(--muted); transition: background .2s, color .2s; white-space: nowrap; }
-.seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.seg button[aria-checked="true"] { background: var(--raised); color: var(--ink); box-shadow: var(--shadow); }
 .seg.wide { margin: 24px 0 16px; }
 .seg.wide button { min-height: 52px; padding: 8px; }
 .seg .count { margin-left: 6px; font-weight: 500; color: var(--muted); }
@@ -247,7 +249,7 @@ svg.lucide { width: 22px; height: 22px; stroke-width: 2; flex: none; }
   h1 { font-size: 36px; }
   .app { padding: 0 32px 120px; }
   .bank .btn { width: auto; }
-  .task .btn.block { width: auto; align-self: flex-start; }
+  .task .btn.block, .next-card .btn.block { width: auto; align-self: flex-start; }
   .land-hero { padding: 48px; }
   .benefits { grid-template-columns: repeat(2, 1fr); gap: 24px; }
   .land-visual { max-width: 460px; padding-bottom: 32px; }
@@ -296,6 +298,7 @@ svg.lucide { width: 22px; height: 22px; stroke-width: 2; flex: none; }
 .stats .card { display: grid; gap: 4px; align-content: start; padding: 16px 20px; }
 .stats small { color: var(--muted); font-size: 15px; }
 .stats b { font-size: 26px; font-weight: 800; }
+@media (max-width: 719px) { .stats .card:nth-child(3):last-child { grid-column: 1 / -1; } }
 .reviews { display: grid; gap: 16px; }
 .review { display: grid; gap: 8px; justify-items: start; }
 .review b { font-weight: 700; overflow-wrap: anywhere; }
