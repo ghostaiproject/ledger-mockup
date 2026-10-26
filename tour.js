@@ -45,7 +45,7 @@ const TOUR = {
   },
 };
 const TOUR_ROUTE = ['auto', 'auto', 'auto', 'engine', 'review', 'review', 'review', 'calendar', 'auto', 'auto', 'auto'];
-const TOUR_SPOT = ['#autoFeed', '#autoOut .stats', '#autoOut .reviews', '#set-duplicateDays', '#rvOut .batch', '#rvOut .checks-out', '#rvOut .sigs', '#calOut .agenda', '#autoOut .dl', '[data-vault-lock]', '[data-sync-open]'];
+const TOUR_SPOT = ['#autoFeed .chips', '#autoOut .stats', '#autoOut .reviews', '#set-duplicateDays', '#rvOut .batch', '#rvOut .checks-out', '#rvOut .sigs', '#calOut .agenda', '#autoOut .dl', '[data-vault-lock]', '[data-sync-open]'];
 const webDemo = () => typeof DemoNative !== 'undefined' && !!DemoNative;
 function tourSteps() { // app: the 9 real steps; web demo: + pretend lock and cloud
   const T = TOUR[state.lang];
@@ -96,11 +96,23 @@ function tourSpot() {
     if (!el) return;
     const box = el.closest('li.set') || el;
     box.classList.add('spot');
-    box.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'center' });
+    tourFit(box);
   }, 160);
 }
+function tourFit(box) { // the spot goes in the clear space above the coach card, never under it
+  const card = $('#tour'); if (!card || !box.isConnected) return;
+  const cardTop = card.getBoundingClientRect().top, gap = 16;
+  document.documentElement.style.setProperty('--tour-h', `${innerHeight - cardTop + gap}px`); // room to scroll the last spot up
+  const r = box.getBoundingClientRect(), room = cardTop - gap * 2;
+  const wide = innerWidth >= 1080 && r.right < card.getBoundingClientRect().left - gap; // desktop: card beside it, no overlap
+  if (wide || (r.top >= gap && r.bottom <= cardTop - gap)) return; // already in view and clear
+  const top = r.height >= room ? gap : gap + (room - r.height) / 2;
+  scrollTo({ top: scrollY + r.top - top, behavior: calm ? 'auto' : 'smooth' });
+}
+addEventListener('resize', () => { const b = document.querySelector('.spot'); if (b && state.tour) tourFit(b); });
 function renderTour() {
   let el = $('#tour');
+  document.documentElement.classList.toggle('touring', !!state.tour);
   if (!state.tour) { if (el) el.remove(); document.querySelectorAll('.spot').forEach((x) => x.classList.remove('spot')); return; }
   if (!el) { el = document.createElement('aside'); el.id = 'tour'; el.className = 'tour'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el); }
   const T = TOUR[state.lang], S = tourSteps(), i = state.tour.i, [h, p, btn] = S[i], r = state.auto.result;
