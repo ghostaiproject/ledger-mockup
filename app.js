@@ -329,7 +329,7 @@ function renderShell() {
   const NAV = { today: 'sun', engagements: 'briefcase', calendar: 'calendar-days', review: 'shield-check', yearend: 'folder-open', requests: 'inbox', time: 'timer', clients: 'users', auto: 'wand-sparkles', money: 'wallet', close: 'list-checks', engine: 'sliders-horizontal', more: 'layout-grid' };
   const PHONE = ['today', 'engagements', 'calendar', 'review', 'more'];
   const cur = (id) => state.route === id || (id === 'calendar' && state.route === 'deadlines');
-  const GROUP = { today: 0, yearend: 1, clients: 2 }; // side-bar headings on a computer
+  const GROUP = { yearend: 1, clients: 2 }; // side-bar headings on a computer (none over Today: the brand sits there)
   $('.nav').innerHTML = Object.entries(NAV).map(([id, ic]) => `${id in GROUP ? `<span class="nav-h wide-only" aria-hidden="true">${tf().navGroups[GROUP[id]]}</span>` : ''}<a href="#/${id}" class="${id === 'more' ? 'phone-only' : PHONE.includes(id) ? '' : 'wide-only'}" ${cur(id) ? 'aria-current="page"' : ''}>
     <i data-lucide="${ic}"></i><span>${t().nav[id]}</span></a>`).join('');
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.dataset.screen === state.route));
