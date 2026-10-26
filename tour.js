@@ -16,6 +16,11 @@ const TOUR = {
       ['Produire à temps', (r) => `La TPS/TVQ de septembre est due le ${day(r.taxes.due)}. Elle est au calendrier avec toutes les autres échéances du portefeuille. Je la marque comme produite.`, 'Marquer comme produite'],
       ['Livrer au client', 'Écritures de journal, banque classée, déclaration TPS/TVQ, balance de vérification et piste de vérification en CSV, plus un résumé en mots simples pour le client.', 'Copier le résumé et terminer'],
     ],
+    web: [ // web demo only: the lock and the cloud are pretend here (demo-native.js); the app has the real ones
+      ['Verrouiller le coffre', 'Dans l’app, les dossiers sont chiffrés sur l’appareil et le coffre se verrouille après 10 min sans activité. Ici c’est simulé : je verrouille, puis Windows Hello (simulé) rouvre.', 'Verrouiller et rouvrir'],
+      ['Synchroniser avec Google Drive', 'Dans l’app, le coffre chiffré se synchronise avec ton Google Drive entre ordinateur et téléphone. Ici c’est simulé : je connecte, je synchronise et un conflit exemple apparaît.', 'Synchroniser et terminer'],
+    ],
+    deliverNext: 'Copier le résumé',
   },
   en: {
     step: (i, n) => `Step ${i} of ${n}`, quit: 'Leave the tour', pause: 'Pause', play: 'Play', restart: 'Restart the tour',
@@ -32,10 +37,39 @@ const TOUR = {
       ['File on time', (r) => `September GST/QST is due ${day(r.taxes.due)}. It sits on the calendar with every other date for the client list. I mark it filed.`, 'Mark as filed'],
       ['Deliver to the client', 'Journal entries, sorted bank, GST/QST return, trial balance and audit trail as CSV, plus a plain-words summary for the client.', 'Copy the summary and finish'],
     ],
+    web: [
+      ['Lock the vault', 'In the app, files are encrypted on the device and the vault locks after 10 min of no activity. Here it is pretend: I lock it, then Windows Hello (simulated) opens it again.', 'Lock and reopen'],
+      ['Sync with Google Drive', 'In the app, the encrypted vault syncs through your Google Drive between computer and phone. Here it is pretend: I connect, sync, and a sample conflict shows up.', 'Sync and finish'],
+    ],
+    deliverNext: 'Copy the summary',
   },
 };
-const TOUR_ROUTE = ['auto', 'auto', 'auto', 'engine', 'review', 'review', 'review', 'calendar', 'auto'];
-const TOUR_SPOT = ['#autoFeed', '#autoOut .stats', '#autoOut .reviews', '#set-duplicateDays', '#rvOut .batch', '#rvOut .checks-out', '#rvOut .sigs', '#calOut .agenda', '#autoOut .dl'];
+const TOUR_ROUTE = ['auto', 'auto', 'auto', 'engine', 'review', 'review', 'review', 'calendar', 'auto', 'auto', 'auto'];
+const TOUR_SPOT = ['#autoFeed', '#autoOut .stats', '#autoOut .reviews', '#set-duplicateDays', '#rvOut .batch', '#rvOut .checks-out', '#rvOut .sigs', '#calOut .agenda', '#autoOut .dl', '[data-vault-lock]', '[data-sync-open]'];
+const webDemo = () => typeof DemoNative !== 'undefined' && !!DemoNative;
+function tourSteps() { // app: the 9 real steps; web demo: + pretend lock and cloud
+  const T = TOUR[state.lang];
+  if (!webDemo()) return T.s;
+  const s = T.s.slice(); s[s.length - 1] = [...s[s.length - 1].slice(0, 2), T.deliverNext];
+  return [...s, ...T.web];
+}
+const hold = (ms) => new Promise((ok) => setTimeout(ok, ms)); // pretend screens need real time, even with reduced motion
+async function tourLock() {
+  const D = DemoNative;
+  if ((await D.status()).state === 'new') await D.vault.create(`folio-demo-${Date.now()}`); // the tour's own pretend vault
+  await VaultUI.lock('manual');
+  await hold(1800);
+  document.querySelector('#vault [data-v="hello"]')?.click();
+  await Promise.race([D.isOpen, hold(6000)]);
+  await hold(500);
+}
+async function tourSync() {
+  const q = (s) => document.querySelector(s);
+  q('[data-sync-open]')?.click(); await hold(900);
+  if (q('[data-sync="on"]')) { q('[data-sync="on"]').click(); await hold(3200); } else { q('[data-sync="run"]')?.click(); await hold(1800); }
+  await hold(2600);
+  q('[data-sync="close"]')?.click();
+}
 const wait = (ms) => new Promise((ok) => setTimeout(ok, calm ? 0 : ms));
 let tourTimer = null;
 function tourStart(auto = false) {
@@ -52,7 +86,7 @@ function tourNext() { // autoplay: time to read the card, then the step runs by 
   tourTimer = setTimeout(tourGo, tourDelay());
 }
 function tourDelay() {
-  const [h, p] = TOUR[state.lang].s[state.tour.i], r = state.auto.result;
+  const [h, p] = tourSteps()[state.tour.i], r = state.auto.result;
   return Math.min(9000, 2600 + (h + (typeof p === 'function' ? (r && r.ok ? p(r) : '') : p)).length * 28);
 }
 function tourSpot() {
@@ -69,8 +103,8 @@ function renderTour() {
   let el = $('#tour');
   if (!state.tour) { if (el) el.remove(); document.querySelectorAll('.spot').forEach((x) => x.classList.remove('spot')); return; }
   if (!el) { el = document.createElement('aside'); el.id = 'tour'; el.className = 'tour'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el); }
-  const T = TOUR[state.lang], i = state.tour.i, [h, p, btn] = T.s[i], r = state.auto.result;
-  el.innerHTML = `<div class="tour-top"><span class="pill">${T.step(i + 1, T.s.length)}</span><span class="dots" aria-hidden="true">${T.s.map((_, k) => `<i class="${k < i ? 'd' : k === i ? 'on' : ''}"></i>`).join('')}</span>
+  const T = TOUR[state.lang], S = tourSteps(), i = state.tour.i, [h, p, btn] = S[i], r = state.auto.result;
+  el.innerHTML = `<div class="tour-top"><span class="pill">${T.step(i + 1, S.length)}</span><span class="dots" aria-hidden="true">${S.map((_, k) => `<i class="${k < i ? 'd' : k === i ? 'on' : ''}"></i>`).join('')}</span>
       <button class="round" data-tour="restart" aria-label="${T.restart}" title="${T.restart}"><i data-lucide="rotate-ccw"></i></button>
       <button class="round" data-tour="quit" aria-label="${T.quit}" title="${T.quit}"><i data-lucide="circle-x"></i></button></div>
     <b>${h}</b><p>${typeof p === 'function' ? (r && r.ok ? p(r) : '') : p}</p>
@@ -109,11 +143,13 @@ async function tourGo() {
     if (ev) state.filed.add(ev.id);
     toast(t().toastFiled);
   }
+  else if (i === 9) await tourLock();
+  else if (i === 10) await tourSync();
   else if (i === 8) { try { await navigator.clipboard.writeText($('#sumText').textContent); } catch (e) { /* clipboard blocked: the text is on screen */ } }
   tr.busy = false;
   if (tr.after) { const k = tr.after; tourStop(); if (k === 'quit') render(); else tourStart(k === 'play' || tr.auto); return; } // asked mid-step
   if (state.tour !== tr) return;
-  if (i === T.s.length - 1) { state.tour = null; render(); toast(T.toastEnd); return; }
+  if (i === tourSteps().length - 1) { state.tour = null; render(); toast(T.toastEnd); return; }
   tr.i = i + 1;
   if (TOUR_ROUTE[tr.i] === 'calendar') { state.cal.client = 'boreal'; state.cal.off = []; calGo(a.result.taxes.due); }
   if (location.hash !== '#/' + TOUR_ROUTE[tr.i]) location.hash = '#/' + TOUR_ROUTE[tr.i]; else render();
@@ -121,10 +157,10 @@ async function tourGo() {
 }
 /** Web demo entry: first visit in this tab (or a ?demo / #demo link) offers the guided demo. Not in the app. */
 function tourWelcome() {
-  const ask = /[?&#]demo/.test(location.search + location.hash);
+  const ask = /[?&#]demo\b/.test(location.search + location.hash);
   let seen = false; try { seen = !!sessionStorage.getItem('folio-welcome'); sessionStorage.setItem('folio-welcome', '1'); } catch (e) { /* private window */ }
   if (!(typeof DemoNative !== 'undefined' && DemoNative) || state.tour || (seen && !ask)) return;
-  if (/[?&]demo=play/.test(location.search)) { tourStart(true); return; }
+  if (/[?&]demo=play\b/.test(location.search)) { tourStart(true); return; }
   const T = TOUR[state.lang], el = document.createElement('div');
   el.className = 'welcome'; el.id = 'welcome';
   el.innerHTML = `<div class="welcome-card" role="dialog" aria-modal="true" aria-labelledby="welcome-h">
