@@ -112,7 +112,7 @@
   .app { grid-template-columns: 232px minmax(0, 1fr); column-gap: 40px; max-width: 1560px; padding: 0 40px 64px; }
   .main { max-width: none; }
   .screen > .lead { max-width: 72ch; }
-  .nav { gap: 2px; max-height: calc(100vh - 48px); overflow-y: auto; }
+  .nav { gap: 2px; max-height: calc(100vh - 116px); overflow-y: auto; } /* below the pinned header */
   .nav a { min-height: 44px; padding: 10px 14px; font-size: 15px; border-radius: 12px; }
   .nav a svg.lucide { width: 19px; height: 19px; }
   .nav .nav-h { display: block; padding: 16px 14px 6px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
