@@ -27,6 +27,8 @@ const VAULT_T = {
     newDevice: 'Première ouverture sur cet appareil : entrez la phrase secrète, Windows Hello s’en souviendra ensuite.',
     unlock: 'Déverrouiller', checking: 'Vérification…',
     lockBtn: 'Verrouiller Folio',
+    demo: 'Démo web : rien n’est chiffré ici. Windows Hello est simulé, la phrase reste dans cet onglet et le verrou automatique part après 2 min.',
+    demoReset: 'Réinitialiser la démo',
     errs: [
       [/wrong passphrase/, 'Phrase secrète incorrecte.'],
       [/Hello cancelled/, 'Windows Hello annulé.'],
@@ -62,6 +64,8 @@ const VAULT_T = {
     newDevice: 'First time on this device: enter the passphrase, then Windows Hello will remember it.',
     unlock: 'Unlock', checking: 'Checking…',
     lockBtn: 'Lock Folio',
+    demo: 'Web demo: nothing is encrypted here. Windows Hello is simulated, the passphrase stays in this tab and auto-lock kicks in after 2 min.',
+    demoReset: 'Reset the demo',
     errs: [
       [/wrong passphrase/, 'Wrong passphrase.'],
       [/Hello cancelled/, 'Windows Hello cancelled.'],

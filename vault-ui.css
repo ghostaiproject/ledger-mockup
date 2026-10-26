@@ -65,3 +65,7 @@
 .sync-warn { padding: 12px 14px; border-radius: 12px; background: var(--amber-tint); color: var(--amber); font-size: 15px; }
 .sync-note { color: var(--accent-ink); font-weight: 600; }
 .sync-card .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* Web demo labels (demo-native.js) */
+.vault-demo, .sync-demo { display: flex; gap: 10px; align-items: flex-start; margin: 24px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--amber-tint); color: var(--amber); font-size: 15px; line-height: 1.4; }
+.vault-demo svg { flex: none; width: 20px; height: 20px; margin-top: 1px; }
+.sync-card .sync-demo { margin: 0; }

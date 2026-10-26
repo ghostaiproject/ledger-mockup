@@ -1,7 +1,8 @@
-/* App only: Google Drive sync button + panel (connect, sync now, conflicts). Null on the web demo.
+/* Google Drive sync button + panel (connect, sync now, conflicts). Web demo: runs on DemoNative (demo-native.js),
+   a pretend Drive that never leaves the browser and shows one sample conflict on the first sync.
    Runs on open, every 5 min while open and on "Sync now". */
 const SyncUI = (() => {
-  const S = typeof StoreNative !== 'undefined' ? StoreNative : null;
+  const S = (typeof StoreNative !== 'undefined' && StoreNative) || (typeof DemoNative !== 'undefined' && DemoNative) || null;
   if (!S) return { start() {} };
   const tx = () => SYNC_T[state.lang === 'en' ? 'en' : 'fr'];
   const CLOUD = '<svg class="lucide" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>';
@@ -31,7 +32,7 @@ const SyncUI = (() => {
   }
 
   async function connect() {
-    busy = true; note = tx().connecting; draw();
+    busy = true; note = st.demo ? tx().demoConnecting : tx().connecting; draw();
     try { await S.sync.connect(); busy = false; await refresh(); await run(); } catch (e) { busy = false; note = msg(e); draw(); }
   }
 
@@ -52,6 +53,7 @@ const SyncUI = (() => {
     const T = tx(), dis = busy ? 'disabled' : '';
     panel.querySelector('.sync-card').innerHTML = `
       <h2 id="sync-h">${T.title}</h2><p class="muted">${T.lead}</p>
+      ${st.demo ? `<p class="sync-demo">${T.demo}</p>` : ''}
       <p><b>${st.connected ? T.on : T.off}</b> · <span class="muted">${st.last ? T.last(when(st.last)) : T.never}</span></p>
       ${!st.configured ? `<p class="sync-warn">${T.setup}</p>` : ''}
       ${note ? `<p class="sync-note" role="status">${esc(note)}</p>` : ''}

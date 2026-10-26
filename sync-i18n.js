@@ -10,6 +10,8 @@ const SYNC_T = {
     done: (r) => `${r.up} envoyé${r.up > 1 ? 's' : ''} · ${r.down} reçu${r.down > 1 ? 's' : ''}${r.conflicts ? ` · ${r.conflicts} conflit${r.conflicts > 1 ? 's' : ''}` : ''}`,
     bad: (n) => `${n} fichier(s) n’ont pas pu être synchronisés (réessayez).`,
     cH: 'Conflits', cLead: 'Deux appareils ont modifié la même fiche. La plus récente a été gardée ; voici l’autre version.',
+    demo: 'Démo web : aucun compte Google n’est utilisé et rien ne quitte ce navigateur. La première synchronisation montre un conflit d’exemple.',
+    demoConnecting: 'Connexion à Google Drive (simulée)…',
     cNone: 'Aucun conflit.', restore: 'Reprendre cette version', dismiss: 'Ignorer', restored: 'Version reprise',
   },
   en: {
@@ -22,6 +24,8 @@ const SYNC_T = {
     done: (r) => `${r.up} sent · ${r.down} received${r.conflicts ? ` · ${r.conflicts} conflict${r.conflicts > 1 ? 's' : ''}` : ''}`,
     bad: (n) => `${n} file(s) could not sync (try again).`,
     cH: 'Conflicts', cLead: 'Two devices changed the same record. The newer one was kept; here is the other version.',
+    demo: 'Web demo: no Google account is used and nothing leaves this browser. The first sync shows a sample conflict.',
+    demoConnecting: 'Connecting to Google Drive (simulated)…',
     cNone: 'No conflicts.', restore: 'Use this version', dismiss: 'Dismiss', restored: 'Version restored',
   },
 };

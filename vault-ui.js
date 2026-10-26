@@ -1,8 +1,9 @@
 /* App only: first run (create the vault, then empty firm or sample), unlock (Windows Hello first, passphrase second),
    lock button and auto-lock after 10 min idle. Locking saves, closes the vault in Rust, then reloads the page so no
-   client data stays in memory. Web demo (GitHub Pages): StoreNative is null, this stays null. Words: vault-i18n.js. */
-const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
-  const S = StoreNative, IDLE_MIN = 10;
+   client data stays in memory. Web demo (GitHub Pages): runs on DemoNative (demo-native.js), nothing is encrypted, the
+   lock is an overlay (no reload) and starts from the lock button. Words: vault-i18n.js. */
+const VaultUI = (typeof StoreNative !== 'undefined' && StoreNative) || (typeof DemoNative !== 'undefined' && DemoNative) ? (() => {
+  const S = StoreNative || DemoNative, IDLE_MIN = S.idleMin || 10;
   const SVG = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
     + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
   const ic = (n) => `<svg class="lucide lucide-${n}" ${SVG}>${(window.ICONS || {})[n] || ''}</svg>`;
@@ -10,7 +11,7 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
   const BG_MS = 30000;
   const idleMin = () => { const v = parseFloat(localStorage.getItem('solva-idle-min')); return v > 0 ? v : IDLE_MIN; };
   let lang = pref().lang === 'en' ? 'en' : 'fr';
-  let root = null, st = null, view = '', reason = '', busy = false, shown = false, locking = false;
+  let root = null, st = null, view = '', reason = '', busy = false, shown = false, locking = false, armed = false;
   // On Android the device key is the phone lock (Keystore + fingerprint, face or PIN), not Windows Hello
   const dev = (v) => typeof v === 'string' ? v.replace(/Utiliser Windows Hello/, 'Utiliser l’empreinte ou le NIP').replace(/Use Windows Hello/, 'Use fingerprint or PIN').replace(/Windows Hello/g, lang === 'en' ? 'your phone lock' : 'le verrouillage du téléphone')
     : Array.isArray(v) ? v.map(dev) : v instanceof RegExp || typeof v !== 'object' || !v ? v : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dev(x)]));
@@ -64,13 +65,15 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     root.innerHTML = `<div class="vault-card"><div class="vault-top"><span class="brand"><span class="logo">${ic('sprout')}</span><b>Folio</b></span>
       <div class="seg" role="radiogroup" aria-label="${tx().lang}">${['fr', 'en'].map((l) => `<button type="button" role="radio" data-v="lang" data-l="${l}"
         lang="${l}-CA" aria-checked="${l === lang}" tabindex="${l === lang ? 0 : -1}" aria-label="${tx()[l]}">${l.toUpperCase()}</button>`).join('')}</div></div>
-      ${VIEWS[view]()}</div>`;
+      ${VIEWS[view]()}${S.demo ? `<p class="vault-demo">${ic('info')}<span>${tx().demo}</span></p>
+      <button class="vault-link" type="button" data-v="demo-reset">${tx().demoReset}</button>` : ''}</div>`;
     root.querySelector('.vault-card').lang = `${lang}-CA`;
     ($v(focus) || $v('input') || $v('.btn, .vault-opt') || $v('#vault-h')).focus();
   }
 
   function setBusy(on) {
     busy = on;
+    if (!root) return; // the vault just opened and the screen is gone
     root.querySelectorAll('[data-busy]').forEach((b) => {
       if (on) { b.dataset.idle = b.innerHTML; b.textContent = b.dataset.busy; } else if (b.dataset.idle) b.innerHTML = b.dataset.idle;
       b.disabled = on; b.setAttribute('aria-busy', on);
@@ -112,6 +115,7 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     } else if (k === 'hello') hello();
     else if (k === 'view') go(b.dataset.to);
     else if (k === 'start') S.open(b.dataset.k);
+    else if (k === 'demo-reset') { S.reset(); location.reload(); }
   }
   function onSubmit(e) {
     e.preventDefault();
@@ -130,6 +134,11 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
 
   async function lock(why) {
     if (locking) return;
+    if (S.demo) { // demo: lock screen as an overlay (first press = create the pretend vault)
+      if ((await S.status()).state !== 'new') { await S.vault.lock(); try { sessionStorage.setItem('solva-lock', why); } catch (e) { /* ignore */ } }
+      root = null; start();
+      return;
+    }
     locking = true;
     try { if (typeof Bind !== 'undefined') Bind.flushNow(); await S.flushed(); } finally {
       await S.vault.lock().catch(() => {});
@@ -174,7 +183,7 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     document.body.append(root);
     const app = document.querySelector('.app');
     if (app) app.inert = true; // keyboard and screen readers stay on the lock screen
-    S.isOpen.then(() => { root.remove(); if (app) app.inert = false; armIdle(); addLockButton(); });
+    S.isOpen.then(() => { root.remove(); root = null; if (app) app.inert = false; if (!armed) { armed = true; armIdle(); } addLockButton(); });
     st = await S.status();
     if (st.state === 'open') return S.open();
     go(st.state === 'new' ? 'create' : st.deviceReady ? 'unlock' : 'pass');
@@ -182,5 +191,12 @@ const VaultUI = typeof StoreNative !== 'undefined' && StoreNative ? (() => {
     return undefined;
   }
 
-  return { start, lock };
+  /** Web demo boot (app.js): lock button in the header; after a reload a pretend vault comes back locked. */
+  async function demo() {
+    if (!S.demo) return;
+    addLockButton();
+    if ((await S.status()).state === 'locked') { try { sessionStorage.setItem('solva-lock', 'manual'); } catch (e) { /* ignore */ } start(); }
+  }
+
+  return { start, lock, demo };
 })() : null;

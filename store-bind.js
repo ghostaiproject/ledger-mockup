@@ -79,5 +79,8 @@ const Bind = (() => {
     render();
   }
 
-  return { load, flush, flushNow };
+  // web demo first-run screen picked "empty firm" (demo-native.js): same lists cleared as an empty app firm
+  function emptyFirm() { Object.values(LISTS).forEach((get) => { get().length = 0; }); flushNow(); render(); }
+
+  return { load, flush, flushNow, emptyFirm };
 })();

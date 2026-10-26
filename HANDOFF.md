@@ -1,6 +1,13 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Google Drive sync + warm forest green + new-engagement form)
+## LATEST (2026-10-25, web demo = Folio, desktop-site layout, demo lock + cloud)
+- main now carries app-tauri (Pages shows Folio). Pages workflow unchanged (copies index.html, *.js, *.css, assets; store-native.js stays null on the web).
+- `demo-native.js` (web only, null in the app): pretend backend with the StoreNative vault/sync shape. Vault: create passphrase (SHA-256 in sessionStorage), simulated Hello (1.1 s), wrong passphrase refused, reload = locked again, idle lock after 2 min (`solva-idle-min` still overrides). Sync: fake Drive connect, sync now (14 sent / 3 received), first sync adds one sample conflict (engagement one stage on) that restore applies. Labeled "Démo web" on the lock card and sync panel, plus "Réinitialiser la démo".
+- vault-ui.js / sync-ui.js run on `StoreNative || DemoNative`. Demo lock = overlay, no reload; first lock press opens the create screen; `VaultUI.demo()` is called from app.js boot. `Bind.emptyFirm()` for the demo "Cabinet vide" choice.
+- index.html head: phone/tablet in "desktop site" mode (userAgentData.mobile false or no mobile UA + touch + screen < 900) → viewport `width=1560` (computer layout, side bar groups). Normal phones unchanged.
+- Check: `python tools/demo_check.py http://localhost:5177/` (16 checks, contact sheet `shots/demo-sheet.jpg`); `npm run check` ALL OK.
+
+## Before (2026-10-25, Google Drive sync + warm forest green + new-engagement form)
 - Colors: mint `#DAF1DE` is gone from the tokens. Light: buttons `--accent` #234233, `--tint` #e1e9d6, `--on-accent` #e8efdc, `--accent-ink` #2d5139. Dark: `--accent` #b7cfa3, `--tint` #222a1f. Walnut stays the ring/progress color. Icon and hero art not recolored.
 - `engagement-add.js` ("Nouveau mandat" form under the list; `due` must be a Date like the samples, a number crashes engRow).
 - Sync (plan §6), Rust: `sync.rs` (3-way per sealed file, base hash in sealed `sync/state.json`; both changed = higher (at, dev) wins, loser kept in `sync/conflicts/`; delete travels; foreign-key file refused; unit test with 2 devices), `drive.rs` (Drive v3 appDataFolder via ureq, sha256 in appProperties), `oauth.rs` (PKCE loopback, scope drive.appdata, opens browser with tauri-plugin-opener). Commands `sync_status/connect/disconnect/run`, `conflicts_list`, `conflict_del`. Disk gained `sync_files/raw_get/raw_put/raw_del/side_*`.
