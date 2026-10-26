@@ -226,3 +226,11 @@ table.cal td { padding: 0; }
 .welcome-ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--tint); color: var(--ring); }
 @keyframes fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .welcome, .welcome-card, .tour-clock { animation: none; } }
+.touring body { padding-bottom: var(--tour-h, 280px); } /* the last spot can still scroll above the coach card */
+@media (max-width: 720px) { /* phone: a slimmer coach card leaves more room for the spot */
+  .tour { padding: 14px 16px 16px; gap: 6px; border-radius: 20px; }
+  .tour b { font-size: 17px; }
+  .tour p { font-size: 14.5px; line-height: 1.45; margin: 0; }
+  .tour-top .round { width: 36px; height: 36px; }
+  .tour-acts .btn { min-height: 44px; padding-block: 8px; }
+}
