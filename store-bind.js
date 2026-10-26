@@ -10,6 +10,7 @@ const Bind = (() => {
     aje: () => state.firm.ye.aje,
     chase: () => state.chase,
     mine: () => state.cal.mine,
+    myclients: () => state.myClients, // clients-add.js
   };
   // single records (col 'one'): [get, set]
   const ONES = {
@@ -78,5 +79,8 @@ const Bind = (() => {
     render();
   }
 
-  return { load, flush, flushNow };
+  // web demo first-run screen picked "empty firm" (demo-native.js): same lists cleared as an empty app firm
+  function emptyFirm() { Object.values(LISTS).forEach((get) => { get().length = 0; }); flushNow(); render(); }
+
+  return { load, flush, flushNow, emptyFirm };
 })();

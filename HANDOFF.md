@@ -1,6 +1,32 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
+## LATEST (2026-10-25, web demo = Folio, desktop-site layout, demo lock + cloud)
+- main now carries app-tauri (Pages shows Folio). Pages workflow unchanged (copies index.html, *.js, *.css, assets; store-native.js stays null on the web).
+- `demo-native.js` (web only, null in the app): pretend backend with the StoreNative vault/sync shape. Vault: create passphrase (SHA-256 in sessionStorage), simulated Hello (1.1 s), wrong passphrase refused, reload = locked again, idle lock after 2 min (`solva-idle-min` still overrides). Sync: fake Drive connect, sync now (14 sent / 3 received), first sync adds one sample conflict (engagement one stage on) that restore applies. Labeled "Démo web" on the lock card and sync panel, plus "Réinitialiser la démo".
+- vault-ui.js / sync-ui.js run on `StoreNative || DemoNative`. Demo lock = overlay, no reload; first lock press opens the create screen; `VaultUI.demo()` is called from app.js boot. `Bind.emptyFirm()` for the demo "Cabinet vide" choice.
+- index.html head: phone/tablet in "desktop site" mode (userAgentData.mobile false or no mobile UA + touch + screen < 900) → viewport `width=1560` (computer layout, side bar groups). Normal phones unchanged.
+- Check: `python tools/demo_check.py http://localhost:5177/` (16 checks, contact sheet `shots/demo-sheet.jpg`); `npm run check` ALL OK.
+
+## Before (2026-10-25, Google Drive sync + warm forest green + new-engagement form)
+- Colors: mint `#DAF1DE` is gone from the tokens. Light: buttons `--accent` #234233, `--tint` #e1e9d6, `--on-accent` #e8efdc, `--accent-ink` #2d5139. Dark: `--accent` #b7cfa3, `--tint` #222a1f. Walnut stays the ring/progress color. Icon and hero art not recolored.
+- `engagement-add.js` ("Nouveau mandat" form under the list; `due` must be a Date like the samples, a number crashes engRow).
+- Sync (plan §6), Rust: `sync.rs` (3-way per sealed file, base hash in sealed `sync/state.json`; both changed = higher (at, dev) wins, loser kept in `sync/conflicts/`; delete travels; foreign-key file refused; unit test with 2 devices), `drive.rs` (Drive v3 appDataFolder via ureq, sha256 in appProperties), `oauth.rs` (PKCE loopback, scope drive.appdata, opens browser with tauri-plugin-opener). Commands `sync_status/connect/disconnect/run`, `conflicts_list`, `conflict_del`. Disk gained `sync_files/raw_get/raw_put/raw_del/side_*`.
+- JS: `sync-ui.js` + `sync-i18n.js` (cloud button in the header, panel: connect, sync now, conflicts restore/dismiss; auto sync on open + every 5 min), `Store.ingest(rec)` merges downloaded records, `StoreNative.sync.*`.
+- NEEDS from the owner: a Google Cloud OAuth client (type Desktop app, Drive API enabled, drive.appdata scope) → `%APPDATA%\ca.folio.app\google.json` {"client_id","client_secret"} (or env FOLIO_GOOGLE_CLIENT_ID/SECRET). NOT tried against real Google yet; only the merge logic is tested (in-memory remote). Android: loopback sign-in untested, deep link not done.
+- `npm run check` ALL OK, incl. new checks (hand-added client + engagement survive restart, sync button).
+
+## Before (2026-10-25, app icon + add clients by hand)
+- Icon: /ceig (Gemini) walnut F with mint page edge + ledger lines on charcoal, `src-tauri/app-icon.png` → `npx tauri icon` regenerated `src-tauri/icons/*` (incl. android).
+- Clients screen: "Ajouter un client" form (`clients-add.js`, loaded before app.js; `ClientsAdd.sync()/after()` called from `render()`). Own clients live in `state.myClients`, saved as collection `myclients` (Bind LISTS), merged into `CLIENTS`; remove button + undo toast. Only clients; engagements/deadlines/autopilot still have no manual add (follow-up).
+- Checked in browser (add + remove) and `npm run check` ALL OK. Not yet tested: add client then restart in the Tauri app.
+
+## Before (2026-10-25, Android keystore plugin + CI)
+- `src-tauri/plugins/keystore/` (Rust + Kotlin): Keystore HMAC-SHA256 key, per-use auth via BiometricPrompt + CryptoObject (fingerprint/face/PIN, minSdk 30). Same `secret(name, challenge)` contract as Hello; `device.rs` kind = "keystore" on Android. Registered in lib.rs under `cfg(target_os = "android")`.
+- UI: on keystore the "Windows Hello" strings become "phone lock" (`dev()` in vault-ui.js); locks after 30 s in the background (`bg` reason).
+- CI: `.github/workflows/app.yml` = Windows (tests + unsigned msi/nsis) + Android (`tauri android init` + debug apk) artifacts. Kotlin/Android NOT compiled locally: first CI run is the real test; fix from its log. Not tried on a phone.
+- `npm run check`: ALL OK (desktop unchanged).
+
+## Before (2026-10-25, Tauri app: lock + first-run screens; brand renamed Solva → Folio)
 - Rename: Solva → Folio everywhere (exe `folio.exe`, id `ca.folio.app`, env `FOLIO_DATA_DIR` / `FOLIO_DEVICE`). Storage keys kept (`solva-v3`, `solva-store-web`, `solva-idle-min`, `solva-lock`, HMAC label `solva-name`) so nothing needs migrating.
 - Screens: `vault-ui.js` + `vault-ui.css` + `vault-i18n.js` (FR/EN), app only (null on the web demo). First run = create (passphrase twice, min 10, strength meter, "keep it safe" warning, Hello note) → "Par où commencer?" (Cabinet vide / Charger l'exemple). Locked = Windows Hello button first (opens by itself at start, not after a lock) + "Utiliser ma phrase secrète"; no device copy = passphrase form ("Première ouverture sur cet appareil…"). Rust errors shown in FR/EN.
 - Lock: header lock button + auto-lock after 10 min idle (`localStorage solva-idle-min` overrides). Lock = save → `vault_lock` → page reload, so no decrypted data stays in memory. `.app` is `inert` under the lock screen.

@@ -18,6 +18,11 @@ fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), String> {
 }
 
 impl Disk {
+    /// A second handle on the same vault for a background job (sync); the key is zeroized when it drops.
+    pub fn key_copy(&self) -> Key {
+        zeroize::Zeroizing::new(*self.key)
+    }
+
     pub fn new(dir: PathBuf, key: Key) -> Self {
         Disk { dir, key }
     }
@@ -96,6 +101,59 @@ impl Disk {
             }
         }
         Ok(())
+    }
+    // ---- raw sealed files, for sync (docs/APP-PLAN.md §6). Cloud and disk hold the very same sealed bytes. ----
+
+    /// Names of the files that sync: vault.json, every record and every document file.
+    pub fn sync_files(&self) -> Vec<String> {
+        let mut out = vec![];
+        if self.dir.join("vault.json").exists() {
+            out.push("vault.json".to_string());
+        }
+        for sub in ["rec", "doc"] {
+            let Ok(top) = fs::read_dir(self.dir.join(sub)) else { continue };
+            for e in top.flatten() {
+                let p = e.path();
+                let files: Vec<PathBuf> = if p.is_dir() { fs::read_dir(&p).into_iter().flatten().flatten().map(|f| f.path()).collect() } else { vec![p] };
+                out.extend(files.iter().filter(|f| f.extension().is_some_and(|x| x == "enc" || x == "m")).map(|f| self.rel_of(f)));
+            }
+        }
+        out
+    }
+    pub fn raw_get(&self, rel: &str) -> Option<Vec<u8>> {
+        fs::read(self.dir.join(rel)).ok()
+    }
+    /// Accepts only bytes that open with this vault's key (a file from another vault is refused). vault.json is plain JSON.
+    pub fn raw_put(&self, rel: &str, bytes: &[u8]) -> Result<(), String> {
+        if rel != "vault.json" {
+            crypt::open(&self.key, bytes, rel.as_bytes()).map_err(|_| format!("{rel}: not sealed with this vault's key"))?;
+        }
+        write_atomic(&self.dir.join(rel), bytes)
+    }
+    pub fn raw_del(&self, rel: &str) -> Result<(), String> {
+        let p = self.dir.join(rel);
+        if p.exists() { fs::remove_file(p).map_err(|e| e.to_string())? }
+        Ok(())
+    }
+    /// The decrypted record inside a rec/ file, if it is one.
+    pub fn rec_plain(&self, rel: &str) -> Option<String> {
+        if !rel.starts_with("rec/") { return None }
+        String::from_utf8(self.get(rel).ok()?).ok()
+    }
+    /// Open sealed bytes that are not on disk (the cloud copy) with this vault's key.
+    pub fn open_foreign(&self, rel: &str, sealed: &[u8]) -> Option<String> {
+        if !rel.starts_with("rec/") { return None }
+        String::from_utf8(crypt::open(&self.key, sealed, rel.as_bytes()).ok()?.to_vec()).ok()
+    }
+    /// Sync bookkeeping and the conflict copies are sealed under their own fixed names.
+    pub fn side_get(&self, rel: &str) -> Option<String> {
+        String::from_utf8(self.get(rel).ok()?).ok()
+    }
+    pub fn side_put(&self, rel: &str, text: &str) -> Result<(), String> {
+        self.put(rel, text.as_bytes())
+    }
+    pub fn side_list(&self, sub: &str) -> Vec<String> {
+        fs::read_dir(self.dir.join(sub)).into_iter().flatten().flatten().map(|f| self.rel_of(&f.path())).collect()
     }
 }
 

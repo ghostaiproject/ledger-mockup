@@ -1,0 +1,14 @@
+[package]
+name = "tauri-plugin-keystore"
+version = "0.1.0"
+edition = "2021"
+links = "tauri-plugin-keystore"
+description = "Android Keystore + BiometricPrompt device key for Folio (docs/APP-PLAN.md §4)"
+
+[dependencies]
+tauri = "2"
+serde = { version = "1", features = ["derive"] }
+hex = "0.4"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }

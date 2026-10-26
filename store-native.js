@@ -30,6 +30,14 @@ const StoreNative = window.__TAURI_INTERNALS__ ? (() => {
     },
     save: (rec) => queue(() => inv('rec_put', { rec: JSON.stringify(rec) })),
     flushed: () => q,
+    sync: {
+      status: () => inv('sync_status'),
+      connect: () => inv('sync_connect'),
+      disconnect: () => inv('sync_disconnect'),
+      run: async () => { await q; return inv('sync_run'); }, // pending saves land on disk first
+      conflicts: () => inv('conflicts_list'),
+      dismiss: (id) => inv('conflict_del', { id }),
+    },
     doc: {
       add: async (meta, bytes, id) => {
         await queue(() => inv('doc_add', new Uint8Array(bytes), { headers: { id, meta: hex(JSON.stringify(meta)) } }));

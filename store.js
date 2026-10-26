@@ -62,6 +62,8 @@ const Store = (() => {
     del: async (col, id) => { if (recs.has(`${col}/${id}`)) saved(write(col, id, null, true)); },
     on: (ev, fn) => { if (ev === 'change') subs.push(fn); }, // sync pulled new data: fn(col, id, data | null)
     emit: (col, id, data) => subs.forEach((fn) => fn(col, id, data)),
+    /** A record that sync brought down (already saved on disk by Rust): take it into memory and tell the screens. */
+    ingest: (r) => { recs.set(`${r.col}/${r.id}`, r); last = Math.max(last, r.at || 0); api.emit(r.col, r.id, r.del ? null : JSON.parse(r.json, revive)); },
     lock: () => {},
     // documents (bank statements, invoices, PBC docs): sealed on disk in the app, in memory on the web
     doc: StoreNative ? {

@@ -195,6 +195,7 @@ const CLIENTS = [
 ];
 
 const state = {
+  myClients: [], // added by hand (clients-add.js)
   lang: 'fr',
   theme: 'light',
   route: 'home',
@@ -509,7 +510,9 @@ function renderAuto() {
 
 function render() {
   const focus = focusedKey();
+  ClientsAdd.sync();
   renderShell(); renderHome(); renderToday(); renderDeadlines(); renderClients(); renderMoney(); renderClose(); renderAuto(); renderReview(); renderCalendar(); renderEngine(); renderFirm(); renderTour();
+  ClientsAdd.after();
   icons();
   if (focus) document.querySelector(`[data-${attr(focus[0])}="${focus[1]}"]`)?.focus();
   Bind.flush(); // save what changed
@@ -711,7 +714,7 @@ function route(first) {
   if (!first) { window.scrollTo(0, 0); $(`[data-screen="${state.route}"] h1`).focus({ preventScroll: true }); }
 }
 window.addEventListener('hashchange', () => route(false));
-Store.ready().then(Bind.load).then(() => { route(true); document.documentElement.classList.remove('booting'); })
+Store.ready().then(Bind.load).then(() => { SyncUI.start(); if (VaultUI) VaultUI.demo(); route(true); document.documentElement.classList.remove('booting'); })
   .catch((e) => { // app only: vault could not open (lock screen comes with the device-key vault)
     document.documentElement.classList.remove('booting');
     document.body.innerHTML = `<main class="vault-err"><h1>Folio</h1><p>${String(e).replace(/</g, '&lt;')}</p></main>`;

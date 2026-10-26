@@ -62,6 +62,8 @@ const walk = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirect
 rmSync(data, { recursive: true, force: true }); // fresh throwaway vault
 const a = await session(`(async () => {
   state.firm.pbc[2].st = 'waived'; state.firm.time.push({ id: 'tCHECK', eng: 'pins-comp', who: 'JT', date: new Date(), h: 2.25, note: 'restart check', billed: false });
+  state.myClients.push({ id: 'mine:chk', mine: true, name: 'Boulangerie Check', short: 'Boulangerie', profile: { type: 'corp', gst: 'quarterly', fye: 12, payroll: false }, team: '—', close: 0, status: 'progress', note: { fr: 'x', en: 'x' } });
+  state.firm.eng.push({ id: 'chk-comp', client: 'mine:chk', kind: 'comp', period: '2026-12-31', due: new Date(Date.now() + 60 * 864e5), prep: 'AL', rev: 'JT', partner: 'MB', budget: 10, fee: 1500, stage: 0, letter: false, indep: false, mine: true });
   render(); const id = await Store.doc.add({ name: 'releve-juin.pdf', type: 'application/pdf' }, new TextEncoder().encode('%PDF-1.7 Banque').buffer);
   await StoreNative.flushed(); return { native: Store.native, failed: StoreNative.failed, id, lockBtn: !!document.querySelector('[data-vault-lock]') };
 })()`, { pre: `async () => { const s = await StoreNative.status(); await w('#vault form[data-form=create]');
@@ -80,10 +82,13 @@ ok(leaks.length === 0, `no readable client data in file names or contents${leaks
 
 const b = await session(`(async () => {
   const t = state.firm.time.find((x) => x.id === 'tCHECK'), d = (await Store.doc.list())[0];
-  return { note: t?.note, isDate: t?.date instanceof Date, pbc: state.firm.pbc[2].st, doc: d && await (await Store.doc.open(d.id)).text() };
+  const sy = await StoreNative.sync.status();
+  return { mineClient: CLIENTS.some((c) => c.id === 'mine:chk'), mineEng: state.firm.eng.some((e) => e.id === 'chk-comp'), sy, syncBtn: !!document.querySelector('[data-sync-open]'), note: t?.note, isDate: t?.date instanceof Date, pbc: state.firm.pbc[2].st, doc: d && await (await Store.doc.open(d.id)).text() };
 })()`);
 ok(b.note === 'restart check' && b.isDate, 'device key opens at start; time entry back (date revived)');
 ok(b.pbc === 'waived', 'request status back after restart');
+ok(b.mineClient && b.mineEng, 'client and engagement added by hand are back after restart');
+ok(b.syncBtn && b.sy.connected === false && b.sy.last === 0, `sync button shown, not connected (Google id set: ${b.sy.configured})`);
 ok(b.doc === '%PDF-1.7 Banque', 'document opens after restart, same bytes');
 
 rmSync(join(data, 'vault.local.json')); // as on a new device: only the passphrase wrap is there

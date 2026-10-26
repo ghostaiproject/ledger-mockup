@@ -2,6 +2,9 @@
 mod crypt;
 mod device;
 mod disk;
+mod drive;
+mod oauth;
+mod sync;
 #[cfg(windows)]
 mod hello_win;
 mod vault;
@@ -9,7 +12,8 @@ mod vault;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tauri::ipc::{InvokeBody, Request, Response};
-use tauri::{Manager, State};
+use tauri::{AppHandle, Manager, State};
+use tauri_plugin_opener::OpenerExt;
 
 struct App {
     disk: Mutex<Option<disk::Disk>>, // Some = unlocked; dropping it zeroizes the DEK
@@ -99,9 +103,91 @@ fn doc_del(app: State<App>, id: String) -> Result<(), String> {
     with(&app, |d| d.doc_del(&id))
 }
 
+/// {configured: a Google client id exists, connected: signed in, last: ms of the last good sync}
+#[tauri::command]
+fn sync_status(app: State<App>) -> serde_json::Value {
+    let st = with(&app, |d| Ok(sync::load(d))).unwrap_or_default();
+    serde_json::json!({ "configured": oauth::client(&app.dir).is_some(), "connected": st.refresh.is_some(), "last": st.last })
+}
+
+#[tauri::command]
+async fn sync_connect(handle: AppHandle, app: State<'_, App>) -> Result<(), String> {
+    let c = oauth::client(&app.dir).ok_or("no Google client id: see docs/APP-PLAN.md section 6")?;
+    let h2 = handle.clone();
+    let token = tauri::async_runtime::spawn_blocking(move || oauth::connect(&c, |u| h2.opener().open_url(u, None::<&str>).map_err(|e| e.to_string())))
+        .await
+        .map_err(|e| e.to_string())??;
+    with(&app, |d| {
+        let mut st = sync::load(d);
+        st.refresh = Some(token);
+        sync::save(d, &st)
+    })
+}
+
+#[tauri::command]
+fn sync_disconnect(app: State<App>) -> Result<(), String> {
+    with(&app, |d| {
+        let mut st = sync::load(d);
+        st.refresh = None;
+        st.base.clear();
+        sync::save(d, &st)
+    })
+}
+
+/// Push and pull. Needs the vault open and the network; the report says what moved.
+#[tauri::command]
+async fn sync_run(app: State<'_, App>) -> Result<serde_json::Value, String> {
+    let c = oauth::client(&app.dir).ok_or("no Google client id")?;
+    let (dir, key) = {
+        let g = app.disk.lock().map_err(|_| "busy".to_string())?;
+        let d = g.as_ref().ok_or("locked")?;
+        (app.dir.clone(), d.key_copy())
+    };
+    let rep = tauri::async_runtime::spawn_blocking(move || -> Result<sync::Report, String> {
+        let d = disk::Disk::new(dir, key);
+        let mut st = sync::load(&d);
+        let refresh = st.refresh.clone().ok_or("not connected")?;
+        let drive = drive::Drive::new(oauth::access_token(&c, &refresh)?);
+        let rep = sync::run(&d, &drive, &mut st)?;
+        st.last = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|t| t.as_millis() as u64).unwrap_or(0);
+        sync::save(&d, &st)?;
+        Ok(rep)
+    })
+    .await
+    .map_err(|e| e.to_string())??;
+    serde_json::to_value(rep).map_err(|e| e.to_string())
+}
+
+/// Losing versions kept after a clash, each {id, rel, rec}.
+#[tauri::command]
+fn conflicts_list(app: State<App>) -> Result<Vec<serde_json::Value>, String> {
+    with(&app, |d| {
+        Ok(d.side_list("sync/conflicts")
+            .into_iter()
+            .filter_map(|rel| {
+                let mut v: serde_json::Value = serde_json::from_str(&d.side_get(&rel)?).ok()?;
+                v["id"] = rel.into();
+                Some(v)
+            })
+            .collect())
+    })
+}
+
+#[tauri::command]
+fn conflict_del(app: State<App>, id: String) -> Result<(), String> {
+    if !id.starts_with("sync/conflicts/") || id.contains("..") {
+        return Err("bad id".into());
+    }
+    with(&app, |d| d.raw_del(&id))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_keystore::init());
+    builder
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             // debug builds can run on a throwaway folder (tools/app_check.mjs); release always uses the app data dir
             let test_dir = std::env::var_os("FOLIO_DATA_DIR").filter(|_| cfg!(debug_assertions));
@@ -112,7 +198,7 @@ pub fn run() {
             app.manage(App { disk: Mutex::new(None), dir });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![app_info, vault_status, vault_create, vault_unlock, vault_lock, rec_all, rec_put, doc_add, doc_open, doc_list, doc_del])
+        .invoke_handler(tauri::generate_handler![app_info, vault_status, vault_create, vault_unlock, vault_lock, rec_all, rec_put, doc_add, doc_open, doc_list, doc_del, sync_status, sync_connect, sync_disconnect, sync_run, conflicts_list, conflict_del])
         .run(tauri::generate_context!())
         .expect("error while running Folio");
 }

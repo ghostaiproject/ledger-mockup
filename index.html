@@ -3,6 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // Phone or tablet in "desktop site" mode (desktop user agent + touch + small screen): lay the page out at the
+  // computer app's 1560 px width and let the browser zoom it to fit, instead of the phone layout.
+  (() => {
+    const ua = navigator.userAgent, uad = navigator.userAgentData;
+    const mobileUa = uad ? uad.mobile : /Mobi|Android|iPhone|iPad|iPod/.test(ua);
+    if (!mobileUa && navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 900) {
+      document.querySelector('meta[name="viewport"]').content = 'width=1560';
+      document.documentElement.classList.add('desk-site');
+    }
+  })();
+</script>
 <meta name="theme-color" content="#f6f4f0">
 <title>Folio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -184,6 +196,7 @@
 
 <script src="assets/icons.js?v=20261025b"></script>
 <script src="store-native.js?v=20261025b"></script>
+<script src="demo-native.js?v=20261025b"></script>
 <script src="vault-i18n.js?v=20261025b"></script>
 <script src="vault-ui.js?v=20261025b"></script>
 <script src="store.js?v=20261025b"></script>
@@ -193,10 +206,14 @@
 <script src="firm-data.js?v=20261025b"></script>
 <script src="firm-i18n.js?v=20261025b"></script>
 <script src="firm-i18n-en.js?v=20261025b"></script>
+<script src="engagement-add.js?v=20261025b"></script>
 <script src="firm.js?v=20261025b"></script>
 <script src="firm-time.js?v=20261025b"></script>
 <script src="yearend.js?v=20261025b"></script>
 <script src="tour.js?v=20261025b"></script>
+<script src="clients-add.js?v=20261025b"></script>
+<script src="sync-i18n.js?v=20261025b"></script>
+<script src="sync-ui.js?v=20261025b"></script>
 <script src="app.js?v=20261025b"></script>
 </body>
 </html>
