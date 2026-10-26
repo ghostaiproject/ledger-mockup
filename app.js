@@ -6,7 +6,7 @@ const T = {
     kicker: 'Pour les CPA et les cabinets comptables du Québec',
     landTitle: 'Du relevé bancaire aux états financiers signés.',
     landLead: "Folio suit chaque mandat du cabinet : tenue de livres, missions de compilation et d’examen, T2/CO-17 et T1/TP-1. Le pilote auto prépare, le réviseur vérifie, l’associée signe. Temps, TEC et échéances ARC et Revenu Québec du portefeuille au même endroit.",
-    open: 'Voir ma journée', how: 'Comment ça marche',
+    open: 'Voir ma journée', how: 'Comment ça marche', playDemo: 'Lancer la démo',
     benefits: [
       ['wand-sparkles', 'Le pilote auto prépare, tu révises', 'Relevé et factures en entrée : classement, rapprochement, TPS/TVQ, écritures. Seules les exceptions te reviennent.'],
       ['shield-check', 'Chaque décision a sa raison', 'Règle, fournisseur appris, facture reliée : tout est montré, corrigeable, approuvable par lot, puis signé par le préparateur et le réviseur.'],
@@ -83,7 +83,7 @@ const T = {
       tax: { sales: 'Ventes avant taxes · ligne 101', gst: 'TPS perçue · 103', itc: 'CTI · 106', gstNet: 'TPS nette · 109', qst: 'TVQ perçue · 203', itr: 'RTI · 206', qstNet: 'TVQ nette · 209' },
       notDue: 'pas encore due',
       dl: { journal: 'Écritures de journal', bank: 'Banque classée', taxes: 'Déclaration TPS/TVQ', trial: 'Balance de vérification' },
-      copy: 'Copier le résumé pour le client', again: "Recommencer avec d'autres fichiers",
+      copy: 'Copier le résumé pour le client', again: "Recommencer avec d'autres fichiers", againShort: 'Recommencer',
       summary: (c, p, r) => `Bonjour ${c},\n\nVoici ${p} : revenus ${money(r.pnl.revenue)}, dépenses ${money(r.pnl.spent)}, ${r.pnl.profit < 0 ? 'perte nette' : 'bénéfice net'} de ${money(Math.abs(r.pnl.profit))}.\n`
         + `TPS/TVQ ${r.taxes.net < 0 ? 'à recevoir' : 'à remettre'} : ${cents(Math.abs(r.taxes.net))}, avant le ${day(r.taxes.due)}.\nVos clients vous doivent encore ${money(owedTotal(r))}.\n\nBonne journée !`,
       toastDone: (n) => (n ? `Fait. ${n} chose${n > 1 ? 's' : ''} à vérifier` : 'Fait. Les livres sont prêts'),
@@ -97,7 +97,7 @@ const T = {
     kicker: 'For Québec CPAs and accounting firms',
     landTitle: 'From bank statement to signed financial statements.',
     landLead: 'Folio runs every engagement in the firm: bookkeeping, compilation and review engagements, T2/CO-17 and T1/TP-1. Autopilot prepares, the reviewer checks, the partner signs. Time, WIP and every CRA and Revenu Québec date for the portfolio in one place.',
-    open: 'See my day', how: 'How it works',
+    open: 'See my day', how: 'How it works', playDemo: 'Play the demo',
     benefits: [
       ['wand-sparkles', 'Autopilot prepares, you review', 'Statement and invoices in: sorting, matching, GST/QST, journal entries. Only the exceptions come back to you.'],
       ['shield-check', 'Every decision shows its reason', 'Rule, learned vendor, matched invoice: all shown, fixable, approvable in batches, then signed by preparer and reviewer.'],
@@ -174,7 +174,7 @@ const T = {
       tax: { sales: 'Sales before tax · line 101', gst: 'GST collected · 103', itc: 'ITCs · 106', gstNet: 'Net GST · 109', qst: 'QST collected · 203', itr: 'ITRs · 206', qstNet: 'Net QST · 209' },
       notDue: 'not due yet',
       dl: { journal: 'Journal entries', bank: 'Sorted bank', taxes: 'GST/QST return', trial: 'Trial balance' },
-      copy: 'Copy the summary for the client', again: 'Start over with other files',
+      copy: 'Copy the summary for the client', again: 'Start over with other files', againShort: 'Start over',
       summary: (c, p, r) => `Hello ${c},\n\nHere is ${p}: revenue ${money(r.pnl.revenue)}, expenses ${money(r.pnl.spent)}, ${r.pnl.profit < 0 ? 'a loss' : 'a profit'} of ${money(Math.abs(r.pnl.profit))}.\n`
         + `GST/QST ${r.taxes.net < 0 ? 'to get back' : 'to pay'}: ${cents(Math.abs(r.taxes.net))}, by ${day(r.taxes.due)}.\nYour customers still owe you ${money(owedTotal(r))}.\n\nHave a good day!`,
       toastDone: (n) => (n ? `Done. ${n} thing${n > 1 ? 's' : ''} to check` : 'Done. The books are ready'),
@@ -487,7 +487,8 @@ function renderAuto() {
   const n = r.review.length, client = CLIENTS.find((c) => c.id === a.client).name, tx = r.taxes;
   $('#autoOut').innerHTML = `
     <div class="card answer" id="autoAnswer" tabindex="-1">
-      <div><b class="huge num">${n || '✓'}</b><p>${A.need(n)}</p><small class="muted">${client} · ${periodName(r.period)} · ${A.did(r.bank.length + r.invoices)}</small></div></div>
+      <div><b class="huge num">${n || '✓'}</b><p>${A.need(n)}</p><small class="muted">${client} · ${periodName(r.period)} · ${A.did(r.bank.length + r.invoices)}</small></div>
+      <button class="btn soft again-top" data-reset="1"><i data-lucide="rotate-ccw"></i>${A.againShort}</button></div>
     <ul class="stats">
       <li class="card"><small>${A.profit(r.pnl.profit)}</small><b class="num">${money(Math.abs(r.pnl.profit))}</b></li>
       <li class="card"><small>${A.taxes(tx.net)}</small><b class="num">${money(Math.abs(tx.net))}</b><small>${A.by(day(tx.due))}</small></li>
@@ -505,7 +506,7 @@ function renderAuto() {
     <div class="dl">${Object.keys(A.dl).map((k) => `<button class="btn soft" data-dl="${k}"><i data-lucide="download"></i>${A.dl[k]}</button>`).join('')}</div>
     <div class="card summary"><p class="pre" id="sumText">${esc(A.summary(client, periodName(r.period), r))}</p>
       <button class="btn primary block" data-copy="1"><i data-lucide="copy"></i>${A.copy}</button></div>
-    <button class="link again" data-reset="1"><i data-lucide="rotate-ccw"></i>${A.again}</button>`;
+    <button class="btn soft block again" data-reset="1"><i data-lucide="rotate-ccw"></i>${A.again}</button>`;
 }
 
 function render() {
@@ -664,7 +665,7 @@ document.addEventListener('click', (e) => {
   else if (ds.decide) { decide(ds.decide, ds.opt); return; }
   else if (ds.dl) { download(ds.dl); return; }
   else if (ds.copy) { navigator.clipboard.writeText($('#sumText').textContent).then(() => toast(t().auto.toastCopied), () => toast(t().auto.toastNoCopy)); return; }
-  else if (ds.reset) resetAuto();
+  else if (ds.reset) { tourStop(); resetAuto(); }
   else if (ds.file) fileDeadline(ds.file);
   else if (ds.chase) sendReminder(state.chase.find((x) => x.id === ds.chase));
   else if (ds.match) match();
@@ -714,7 +715,7 @@ function route(first) {
   if (!first) { window.scrollTo(0, 0); $(`[data-screen="${state.route}"] h1`).focus({ preventScroll: true }); }
 }
 window.addEventListener('hashchange', () => route(false));
-Store.ready().then(Bind.load).then(() => { SyncUI.start(); if (VaultUI) VaultUI.demo(); route(true); document.documentElement.classList.remove('booting'); })
+Store.ready().then(Bind.load).then(() => { SyncUI.start(); if (VaultUI) VaultUI.demo(); route(true); document.documentElement.classList.remove('booting'); tourWelcome(); })
   .catch((e) => { // app only: vault could not open (lock screen comes with the device-key vault)
     document.documentElement.classList.remove('booting');
     document.body.innerHTML = `<main class="vault-err"><h1>Folio</h1><p>${String(e).replace(/</g, '&lt;')}</p></main>`;
