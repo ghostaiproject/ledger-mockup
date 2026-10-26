@@ -62,7 +62,7 @@ const VaultUI = (typeof StoreNative !== 'undefined' && StoreNative) || (typeof D
   };
 
   function render(focus) {
-    root.innerHTML = `<div class="vault-card"><div class="vault-top"><span class="brand"><span class="logo">${ic('sprout')}</span><b>Folio</b></span>
+    root.innerHTML = `<div class="vault-card"><div class="vault-top"><span class="brand" role="img" aria-label="Folio">${document.querySelector('.bar .logo')?.outerHTML || ''}<b class="word" aria-hidden="true">olio</b></span>
       <div class="seg" role="radiogroup" aria-label="${tx().lang}">${['fr', 'en'].map((l) => `<button type="button" role="radio" data-v="lang" data-l="${l}"
         lang="${l}-CA" aria-checked="${l === lang}" tabindex="${l === lang ? 0 : -1}" aria-label="${tx()[l]}">${l.toUpperCase()}</button>`).join('')}</div></div>
       ${VIEWS[view]()}${S.demo ? `<p class="vault-demo">${ic('info')}<span>${tx().demo}</span></p>
