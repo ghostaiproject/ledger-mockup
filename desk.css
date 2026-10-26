@@ -13,6 +13,7 @@ h1 { font-size: clamp(30px, 4.6vw, 40px); }
 .pill.grey { background: var(--line); color: var(--muted); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .lead.small { font-size: 16px; margin: -8px 0 16px; }
+#yeOut > .lead.small:first-child { margin-top: 8px; }
 
 /* nav: eight sections; on a phone the bar scrolls sideways instead of squeezing */
 @media (max-width: 1079px) {

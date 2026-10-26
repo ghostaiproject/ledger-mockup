@@ -75,6 +75,17 @@ svg.lucide { width: 22px; height: 22px; stroke-width: 2; flex: none; }
 .settings { display: flex; align-items: center; gap: 8px; }
 .icon-btn { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; color: var(--muted); }
 .icon-btn:hover { background: var(--soft); color: var(--ink); }
+/* phones: brand + lock + cloud + FR/EN + theme must fit in 328-358 px */
+@media (max-width: 479px) {
+  .bar { gap: 8px; }
+  .brand { gap: 10px; font-size: 20px; }
+  .logo { width: 40px; height: 40px; border-radius: 12px; }
+  .settings { gap: 2px; }
+  .settings .icon-btn { width: 44px; height: 44px; }
+  .settings .seg { margin: 0 2px; }
+  .settings .seg button { padding: 8px 9px; }
+}
+@media (max-width: 379px) { .brand b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } }
 
 .seg { display: flex; padding: 4px; border-radius: 16px; background: var(--soft); }
 .seg button { flex: 1; min-height: 44px; padding: 8px 14px; border-radius: 12px; font-weight: 600; color: var(--muted); transition: background .2s, color .2s; white-space: nowrap; }

@@ -1,6 +1,10 @@
 # Folio (ledger-mockup) · handoff
 
-## LATEST (2026-10-25, web demo = Folio, desktop-site layout, demo lock + cloud)
+## LATEST (2026-10-26, phone polish)
+- Phone header fits 360–412 px (smaller gaps/logo, 44 px icons, "Folio" word hidden under 380 px): no more sideways scroll / off-center page. Year-end subtitle no longer overlaps the title.
+- Desktop-site detection = desktop UA on a touch-only device (pointer coarse, no fine pointer, screen < 1100). If the browser ignores `width=1560`, the head script turns width media rules on/off as for 1560 px and zooms `html` to fit.
+
+## Before (2026-10-25, web demo = Folio, desktop-site layout, demo lock + cloud)
 - main now carries app-tauri (Pages shows Folio). Pages workflow unchanged (copies index.html, *.js, *.css, assets; store-native.js stays null on the web).
 - `demo-native.js` (web only, null in the app): pretend backend with the StoreNative vault/sync shape. Vault: create passphrase (SHA-256 in sessionStorage), simulated Hello (1.1 s), wrong passphrase refused, reload = locked again, idle lock after 2 min (`solva-idle-min` still overrides). Sync: fake Drive connect, sync now (14 sent / 3 received), first sync adds one sample conflict (engagement one stage on) that restore applies. Labeled "Démo web" on the lock card and sync panel, plus "Réinitialiser la démo".
 - vault-ui.js / sync-ui.js run on `StoreNative || DemoNative`. Demo lock = overlay, no reload; first lock press opens the create screen; `VaultUI.demo()` is called from app.js boot. `Bind.emptyFirm()` for the demo "Cabinet vide" choice.

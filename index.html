@@ -4,15 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
-  // Phone or tablet in "desktop site" mode (desktop user agent + touch + small screen): lay the page out at the
+  // Phone or tablet in "desktop site" mode (desktop user agent on a touch-only device): lay the page out at the
   // computer app's 1560 px width and let the browser zoom it to fit, instead of the phone layout.
   (() => {
     const ua = navigator.userAgent, uad = navigator.userAgentData;
     const mobileUa = uad ? uad.mobile : /Mobi|Android|iPhone|iPad|iPod/.test(ua);
-    if (!mobileUa && navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 900) {
-      document.querySelector('meta[name="viewport"]').content = 'width=1560';
-      document.documentElement.classList.add('desk-site');
-    }
+    const touchOnly = navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
+    if (mobileUa || !touchOnly || Math.min(screen.width, screen.height) >= 1100) return;
+    const W = 1560, html = document.documentElement;
+    document.querySelector('meta[name="viewport"]').content = 'width=' + W;
+    html.classList.add('desk-site');
+    // Some browsers keep their own layout width in this mode: then run the CSS as if the window were 1560 px
+    // (width media rules on/off by hand) and scale the page down to the screen.
+    addEventListener('DOMContentLoaded', () => {
+      if (innerWidth >= W - 40) return;
+      for (const sh of document.styleSheets) {
+        let rules; try { rules = sh.cssRules; } catch { continue; }
+        for (const r of rules) {
+          const t = r.media && r.media.mediaText; if (!t || !/width/.test(t)) continue;
+          const mn = t.match(/min-width:\s*(\d+)px/), mx = t.match(/max-width:\s*(\d+)px/);
+          r.media.mediaText = (!mn || W >= +mn[1]) && (!mx || W <= +mx[1]) ? 'all' : 'not all';
+        }
+      }
+      html.style.width = W + 'px';
+      html.style.zoom = innerWidth / W;
+    });
   })();
 </script>
 <meta name="theme-color" content="#f6f4f0">
