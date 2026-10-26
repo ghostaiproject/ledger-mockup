@@ -42,6 +42,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     for theme in ('light', 'dark'):
         ctx = b.new_context(viewport={'width': 1440, 'height': 900}, color_scheme=theme)
+        ctx.add_init_script("sessionStorage.setItem('folio-welcome', '1')")  # the entry welcome is checked on the phone below
         page = ctx.new_page()
         errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
@@ -132,6 +133,21 @@ with sync_playwright() as p:
             ok(f'normal phone keeps the phone layout ({w}, side {side})', w < 500 and not side)
         else:
             ok(f'desktop site = 1560 px layout with side bar (innerWidth {w})', w == 1560 and side)
+        page.wait_for_selector('#welcome')
+        ok('entry offers the guided demo (play / step / skip)', page.locator('[data-welcome]').count() == 3)
+        snap(page, label + ' · accueil démo')
+        if mobile:  # autoplay: step 1 runs by itself, then Start over is at the top of the result
+            page.click('[data-welcome="play"]')
+            page.wait_for_selector('#tour .tour-clock')
+            page.wait_for_function('state.tour && state.tour.i === 1', timeout=20000)
+            ok('autoplay moves on by itself', True)
+            ok('Start over sits on the result card', page.locator('#autoAnswer .again-top').is_visible())
+            snap(page, label + ' · démo auto')
+            page.click('#autoAnswer .again-top')
+            ok('Start over leaves the tour and clears the result', page.evaluate('!state.tour && !state.auto.result'))
+        else:
+            page.click('[data-welcome="skip"]')
+        ok('second visit in the tab: no welcome', (page.reload(), page.wait_for_selector('.nav a'), page.locator('#welcome').count() == 0)[2])
         snap(page, label)
         ctx.close()
 

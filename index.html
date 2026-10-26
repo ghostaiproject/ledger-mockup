@@ -36,14 +36,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=optional" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261025b">
-<link rel="stylesheet" href="desk.css?v=20261025b">
-<link rel="stylesheet" href="firm.css?v=20261025b">
-<link rel="stylesheet" href="vault-ui.css?v=20261025b">
-<link rel="preload" href="assets/icons.js?v=20261025b" as="script">
-<link rel="preload" href="engine.js?v=20261025b" as="script">
-<link rel="preload" href="desk.js?v=20261025b" as="script">
-<link rel="preload" href="app.js?v=20261025b" as="script">
+<link rel="stylesheet" href="style.css?v=20261026a">
+<link rel="stylesheet" href="desk.css?v=20261026a">
+<link rel="stylesheet" href="firm.css?v=20261026a">
+<link rel="stylesheet" href="vault-ui.css?v=20261026a">
+<link rel="preload" href="assets/icons.js?v=20261026a" as="script">
+<link rel="preload" href="engine.js?v=20261026a" as="script">
+<link rel="preload" href="desk.js?v=20261026a" as="script">
+<link rel="preload" href="app.js?v=20261026a" as="script">
 <!-- screens are filled by app.js: stay hidden until the first render so nothing jumps (3 s fallback if JS fails) -->
 <script>document.documentElement.classList.add('booting'); setTimeout(() => document.documentElement.classList.remove('booting'), 3000);</script>
 </head>
@@ -73,6 +73,7 @@
           <p class="lead" data-i18n="landLead"></p>
           <div class="cta">
             <a class="btn primary big" href="#/today"><span data-i18n="open"></span><i data-lucide="arrow-right"></i></a>
+            <button class="btn soft big" type="button" data-tour="play"><i data-lucide="play"></i><span data-i18n="playDemo"></span></button>
             <a class="link" href="#how" data-i18n="how"></a>
           </div>
         </div>
@@ -210,26 +211,26 @@
 
 <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button class="toast-undo" id="toastUndo" hidden></button></div>
 
-<script src="assets/icons.js?v=20261025b"></script>
-<script src="store-native.js?v=20261025b"></script>
-<script src="demo-native.js?v=20261025b"></script>
-<script src="vault-i18n.js?v=20261025b"></script>
-<script src="vault-ui.js?v=20261025b"></script>
-<script src="store.js?v=20261025b"></script>
-<script src="store-bind.js?v=20261025b"></script>
-<script src="engine.js?v=20261025b"></script>
-<script src="desk.js?v=20261025b"></script>
-<script src="firm-data.js?v=20261025b"></script>
-<script src="firm-i18n.js?v=20261025b"></script>
-<script src="firm-i18n-en.js?v=20261025b"></script>
-<script src="engagement-add.js?v=20261025b"></script>
-<script src="firm.js?v=20261025b"></script>
-<script src="firm-time.js?v=20261025b"></script>
-<script src="yearend.js?v=20261025b"></script>
-<script src="tour.js?v=20261025b"></script>
-<script src="clients-add.js?v=20261025b"></script>
-<script src="sync-i18n.js?v=20261025b"></script>
-<script src="sync-ui.js?v=20261025b"></script>
-<script src="app.js?v=20261025b"></script>
+<script src="assets/icons.js?v=20261026a"></script>
+<script src="store-native.js?v=20261026a"></script>
+<script src="demo-native.js?v=20261026a"></script>
+<script src="vault-i18n.js?v=20261026a"></script>
+<script src="vault-ui.js?v=20261026a"></script>
+<script src="store.js?v=20261026a"></script>
+<script src="store-bind.js?v=20261026a"></script>
+<script src="engine.js?v=20261026a"></script>
+<script src="desk.js?v=20261026a"></script>
+<script src="firm-data.js?v=20261026a"></script>
+<script src="firm-i18n.js?v=20261026a"></script>
+<script src="firm-i18n-en.js?v=20261026a"></script>
+<script src="engagement-add.js?v=20261026a"></script>
+<script src="firm.js?v=20261026a"></script>
+<script src="firm-time.js?v=20261026a"></script>
+<script src="yearend.js?v=20261026a"></script>
+<script src="tour.js?v=20261026a"></script>
+<script src="clients-add.js?v=20261026a"></script>
+<script src="sync-i18n.js?v=20261026a"></script>
+<script src="sync-ui.js?v=20261026a"></script>
+<script src="app.js?v=20261026a"></script>
 </body>
 </html>

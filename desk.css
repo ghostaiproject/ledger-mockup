@@ -212,3 +212,17 @@ table.cal td { padding: 0; }
 .cal-head h2 { min-width: 0; }
 .cal-head .btn { min-height: 48px; padding: 10px 14px; }
 @media (max-width: 480px) { .cal-head { gap: 6px; } .cal-head h2 { font-size: 18px; } .cal-head .round { width: 44px; height: 44px; } }
+.tour-acts { display: grid; grid-template-columns: auto 1fr; gap: 8px; margin-top: 6px; }
+.tour-acts .btn { margin: 0; }
+.tour-clock { height: 3px; border-radius: 3px; background: var(--ring); transform-origin: left; animation: clock var(--t, 5s) linear forwards; opacity: .6; }
+@keyframes clock { from { transform: scaleX(0); } }
+/* web demo entry: offer the guided demo */
+.welcome { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .45); animation: fade .25s ease-out; }
+.welcome-card { width: min(440px, 100%); display: grid; gap: 10px; padding: 26px 24px 20px; background: var(--surface); color: var(--ink); border-radius: 24px;
+  box-shadow: 0 0 0 1px var(--ring), 0 24px 60px rgba(0, 0, 0, .35); animation: rise .35s ease-out; }
+.welcome-card b { font-size: 22px; line-height: 1.2; }
+.welcome-card p { color: var(--muted); margin: 0 0 6px; }
+.welcome-card .link { justify-self: center; background: none; border: 0; font: inherit; font-weight: 700; color: var(--muted); cursor: pointer; padding: 8px; }
+.welcome-ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--tint); color: var(--ring); }
+@keyframes fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .welcome, .welcome-card, .tour-clock { animation: none; } }

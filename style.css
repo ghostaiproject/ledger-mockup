@@ -338,3 +338,6 @@ svg.lucide { width: 22px; height: 22px; stroke-width: 2; flex: none; }
 @media (min-width: 1080px) { .nav a.wide-only { display: flex; } }
 .peek .due .date b { font-size: 20px; }
 .peek .due small { display: block; }
+.answer .again-top { margin-left: auto; flex: none; }
+@media (max-width: 560px) { .answer { flex-wrap: wrap; } .answer .again-top { margin-left: 0; width: 100%; } }
+.btn.again { margin-top: 24px; }
