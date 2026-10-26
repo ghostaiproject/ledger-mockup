@@ -141,6 +141,7 @@ with sync_playwright() as p:
             page.wait_for_selector('#tour .tour-clock')
             page.wait_for_function('state.tour && state.tour.i === 1', timeout=20000)
             ok('autoplay moves on by itself', True)
+            ok('web tour adds the pretend lock + cloud steps (11)', page.evaluate('tourSteps().length') == 11)
             ok('Start over sits on the result card', page.locator('#autoAnswer .again-top').is_visible())
             snap(page, label + ' · démo auto')
             page.click('#autoAnswer .again-top')
